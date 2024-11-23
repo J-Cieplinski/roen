@@ -25,7 +25,7 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 endif ()
 
 if(UNIX)
-    add_definitions(-DUSE_WAYLAND=ON)
+    add_compile_definitions(-DUSE_WAYLAND=ON)
 endif (UNIX)
 
 target_sources(${PROJECT_NAME}
@@ -39,6 +39,11 @@ target_sources(${PROJECT_NAME}
 add_subdirectory(dependencies)
 add_subdirectory(src)
 add_subdirectory(tests)
+
+target_precompile_headers(${PROJECT_NAME}
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/roenpch.hpp
+)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     EnTT::EnTT
