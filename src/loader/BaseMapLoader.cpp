@@ -1,7 +1,5 @@
 #include <loader/BaseMapLoader.hpp>
 
-#include <data_structure/Vector2.hpp>
-
 #include <log/Logger.hpp>
 
 #include <json/single_include/nlohmann/json.hpp>
@@ -14,10 +12,8 @@ namespace roen::loader
 
 using json = nlohmann::json;
 
-using Vector2f = data_structure::Vector2f;
-
 template <typename T>
-data_structure::Vector2f toVector2f(const tson::Vector2<T> v)
+Vector2 toVector2(const tson::Vector2<T> v)
 {
     return {static_cast<float>(v.x), static_cast<float>(v.y)};
 }
@@ -36,10 +32,10 @@ void BaseMapLoader::loadMap(const std::filesystem::path& path)
 
     tson::Tileson tileson;
     auto map = tileson.parse(mapPath);
-    mapSize_ = toVector2f(map->getSize());
+    mapSize_ = toVector2(map->getSize());
     std::vector<MapTile> mappedTiles{};
 
-    auto tileSize = toVector2f(map->getTileSize());
+    auto tileSize = toVector2(map->getTileSize());
 
     auto& textureManager = getTextureManager();
 
@@ -61,7 +57,7 @@ void BaseMapLoader::loadMap(const std::filesystem::path& path)
 
             for (auto& [pos, tile]: layer.getTileData()) {
 
-                auto tilePosition = toVector2f(tile->getPosition(pos));
+                auto tilePosition = toVector2(tile->getPosition(pos));
 
                 if(layerClass == LayerTypes::BACKGROUND)
                 {
@@ -111,27 +107,27 @@ float BaseMapLoader::getTileRotation(tson::Tile *tile)
     return 0.f;
 }
 
-const data_structure::Vector2f& BaseMapLoader::getMapSize() const
+const Vector2& BaseMapLoader::getMapSize() const
 {
     return mapSize_;
 }
 
-void BaseMapLoader::createPathfindingGraph(const std::vector<MapTile>& tiles, Vector2f tileSize)
+void BaseMapLoader::createPathfindingGraph(const std::vector<MapTile>& tiles, Vector2 tileSize)
 {
     //                                                          NW                              W                                  SW
-    std::vector<Vector2f> DIRECTIONS_WITH_DIAGONAL = {{-tileSize.x, -tileSize.y}, {-tileSize.x, 0}, {-tileSize.x, tileSize.y},
+    std::vector<Vector2> DIRECTIONS_WITH_DIAGONAL = {{-tileSize.x, -tileSize.y}, {-tileSize.x, 0}, {-tileSize.x, tileSize.y},
     //                                                      N                       S
                                             {0, -tileSize.y}, {0, tileSize.y},
     //                                                      NE                                  E                                   SE
                                             {tileSize.x, -tileSize.y}, {tileSize.x, 0}, {tileSize.x, tileSize.y}};
 
-    const std::vector<Vector2f> DIRECTIONS = {
+    const std::vector<Vector2> DIRECTIONS = {
     /*W*/   {-tileSize.x, 0},
     /*N*/   {0, -tileSize.y},
     /*S*/   {0, tileSize.y},
     /*E*/   {tileSize.x, 0} };
 
-    auto findTile = [&tiles](Vector2f position) {
+    auto findTile = [&tiles](Vector2 position) {
         return std::ranges::find_if(tiles, [&position](const MapTile& checkedTile) -> bool {
             return checkedTile.position == position;
         });
@@ -146,7 +142,7 @@ void BaseMapLoader::createPathfindingGraph(const std::vector<MapTile>& tiles, Ve
         std::vector<data_structure::MapNode> edges {};
         for(const auto& direction : DIRECTIONS)
         {
-            Vector2f neighbourPos {tile.position.x + direction.x, tile.position.y + direction.y};
+            Vector2 neighbourPos {tile.position.x + direction.x, tile.position.y + direction.y};
             auto mapTile = findTile(neighbourPos);
             if(tileExist(mapTile))
             {

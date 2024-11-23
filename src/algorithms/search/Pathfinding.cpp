@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <ranges>
 
 namespace roen::algorithms
 {
@@ -55,9 +56,9 @@ std::vector<data_structure::MapNode> getNodeOrderFromPath(
 {
     std::vector<data_structure::MapNode> orderedPath {};
     auto current = goal;
-    if(path.find(goal) == path.end())
+    if(!path.contains(goal))
     {
-        SDK_WARN("Couldn't find path with goal: {0}", current.cost()); //TODO: print node coordinates
+        SDK_WARN("Couldn't find path with goal: {0}", goal);
         return orderedPath;
     }
 
@@ -68,9 +69,8 @@ std::vector<data_structure::MapNode> getNodeOrderFromPath(
     }
 
     orderedPath.push_back(start);
-    std::ranges::reverse(orderedPath);
 
-    return orderedPath;
+    return orderedPath | std::ranges::views::reverse | std::ranges::to<std::vector<data_structure::MapNode>>();
 }
 
 float manhattanDistance(const data_structure::MapNode& nodeA, const data_structure::MapNode& nodeB)

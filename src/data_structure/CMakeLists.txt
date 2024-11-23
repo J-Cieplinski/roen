@@ -5,7 +5,6 @@ target_sources(${PROJECT_NAME}
     ${INCLUDE_DIR}/data_structure/MapNode.hpp
     ${INCLUDE_DIR}/data_structure/PriorityQueue.hpp
     ${INCLUDE_DIR}/data_structure/SystemsContainer.hpp
-    ${INCLUDE_DIR}/data_structure/Vector2.hpp
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/MapNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SystemsContainer.cpp

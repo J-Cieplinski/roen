@@ -1,6 +1,5 @@
 #include <algorithms/search/Pathfinding.hpp>
 #include <data_structure/Graph.hpp>
-#include <data_structure/Vector2.hpp>
 
 #include <gtest/gtest.h>
 
@@ -10,7 +9,7 @@ namespace roen::algorithms
 namespace
 {
 
-constexpr data_structure::Vector2f DUMMY_SIZE {16, 16};
+constexpr Vector2 DUMMY_SIZE {16, 16};
 constexpr std::uint32_t DUMMY_COST {0};
 
 } //

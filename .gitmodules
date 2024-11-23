@@ -10,3 +10,6 @@
 [submodule "dependencies/tileson"]
 	path = dependencies/tileson
 	url = git@github.com:J-Cieplinski/tileson.git
+[submodule "dependencies/raylib"]
+	path = dependencies/raylib
+	url = git@github.com:raysan5/raylib.git

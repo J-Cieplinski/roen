@@ -7,14 +7,14 @@ MapNode::MapNode() = default;
 
 MapNode::MapNode(const MapNode& other) = default;
 
-MapNode::MapNode(const Vector2f& position, const Vector2f& size, std::uint32_t cost)
+MapNode::MapNode(const Vector2& position, const Vector2& size, std::uint32_t cost)
     : position_{position}
     , size_{size}
     , movementCost_{cost}
 {
 }
 
-bool MapNode::contains(const Vector2f& entity) const
+bool MapNode::contains(const Vector2& entity) const
 {
     return position_.x <= entity.x
         && (position_.x + size_.x) >= entity.x
@@ -34,22 +34,32 @@ bool operator==(const MapNode& lhs, const MapNode& rhs)
         && lhs.movementCost_ == rhs.movementCost_;
 }
 
-Vector2f MapNode::operator-(const MapNode& other) const
+Vector2 MapNode::operator-(const MapNode& other) const
 {
     return position_ - other.position_;
 }
 
 bool operator<(const MapNode& lhs, const MapNode& rhs)
 {
-    return lhs.position_ < rhs.position_;
+    return std::tie(lhs.position_.x, lhs.position_.y) < std::tie(rhs.position_.x, rhs.position_.y);
 }
 
-const Vector2f& MapNode::getPosition() const
+std::ostream& operator<<(std::ostream& os, const MapNode& node)
+{
+    os << "\n\t{";
+    os << "\n\t\tPosition (" << node.position_.x << ", " << node.position_.y << ")";
+    os << "\n\t\tSize (" << node.size_.x << ", " << node.size_.y << ")";
+    os << "\n\t\tMovement Cost (" << node.movementCost_ << ")";
+    os << "\n\t}";
+    return os;
+}
+
+const Vector2& MapNode::getPosition() const
 {
     return position_;
 }
 
-const Vector2f& MapNode::getSize() const
+const Vector2& MapNode::getSize() const
 {
     return size_;
 }

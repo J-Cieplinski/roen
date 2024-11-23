@@ -31,7 +31,7 @@ public:
 
     void loadAsset(const std::string& id, const std::filesystem::path& path) override;
     void freeAssets() override;
-    [[nodiscard]] AssetType& getAsset(std::uint64_t id) const;
+    AssetType& getAsset(std::uint64_t id) const;
 private:
     inline static std::map<std::uint64_t, AssetType> assets_;
 };

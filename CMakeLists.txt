@@ -11,7 +11,8 @@ find_package(Lua REQUIRED)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
 set(ENTT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/entt/src)
-set(DEPENDENCIES_INCLUDE_DIR ${DEPENDENCIES_DIR} ${ENTT_DIR})
+set(RAYLIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/raylib/src)
+set(DEPENDENCIES_INCLUDE_DIR ${DEPENDENCIES_DIR} ${ENTT_DIR} ${RAYLIB_DIR})
 
 
 #To enable/disable spdlog logging
@@ -22,6 +23,10 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         target_link_options(${PROJECT_NAME} BEFORE PUBLIC -fsanitize=undefined PUBLIC -fsanitize=address)
     endif (UNIX)
 endif ()
+
+if(UNIX)
+    add_definitions(-DUSE_WAYLAND=ON)
+endif (UNIX)
 
 target_sources(${PROJECT_NAME}
     PUBLIC
@@ -39,6 +44,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     EnTT::EnTT
     ${LUA_LIBRARIES}
     nlohmann_json::nlohmann_json
+    raylib
     spdlog::spdlog)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR} ${DEPENDENCIES_INCLUDE_DIR} ${ENTT_DIR} ${LUA_INCLUDE_DIR})
