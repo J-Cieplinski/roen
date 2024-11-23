@@ -14,4 +14,4 @@ target_link_libraries(${PROJECT_NAME}
 
 add_test(ManagerTests ${PROJECT_NAME})
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${MODULES_DIR}/roen/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${DEPENDENCIES_INCLUDE_DIR})

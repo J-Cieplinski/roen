@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
 
-#To force usage of vcpkg cmake toolchain
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/dependencies/vcpkg/scripts/buildsystems/vcpkg.cmake)
-
 project(roen_tests)
 
 enable_testing()

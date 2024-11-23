@@ -45,7 +45,12 @@ public:
 };
 
 #ifdef __GNUC__
+} // roen
+
 #include <cxxabi.h>
+
+namespace roen
+{
 
 inline std::string getDemangledName(const std::string& name)
 {

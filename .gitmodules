@@ -1,0 +1,12 @@
+[submodule "dependencies/json"]
+	path = dependencies/json
+	url = git@github.com:nlohmann/json.git
+[submodule "dependencies/entt"]
+	path = dependencies/entt
+	url = git@github.com:skypjack/entt.git
+[submodule "dependencies/spdlog"]
+	path = dependencies/spdlog
+	url = git@github.com:gabime/spdlog.git
+[submodule "dependencies/tileson"]
+	path = dependencies/tileson
+	url = git@github.com:SSBMTonberry/tileson.git

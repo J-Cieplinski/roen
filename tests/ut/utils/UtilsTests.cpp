@@ -1,7 +1,7 @@
 #include <Utils.hpp>
 
-#include <type_traits>
 #include <tuple>
+#include <type_traits>
 
 #include <gtest/gtest.h>
 
@@ -35,7 +35,7 @@ INSTANTIATE_TEST_SUITE_P(PowerTesting, PowerTest, ::testing::Values(
         std::make_tuple(-5, 3, -125),
         std::make_tuple(31, 2, 961),
         std::make_tuple(31, 5, 28629151),
-        std::make_tuple(31, 5, 28629151)));
+        std::make_tuple(31, 6, 887503681)));
 
 TEST_P(PowerTest, ShouldCorrectlyCalculatePower)
 {

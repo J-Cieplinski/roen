@@ -1,14 +1,18 @@
+cmake_minimum_required(VERSION 3.29)
+
 project(roen)
 
-add_library(${PROJECT_NAME} SHARED)
+set(CMAKE_CXX_STANDARD 23)
 
-find_package(EnTT CONFIG REQUIRED)
+add_library(${PROJECT_NAME} STATIC)
+
 find_package(Lua REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(sol2 CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
 
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
+set(ENTT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/entt/src)
+set(DEPENDENCIES_INCLUDE_DIR ${DEPENDENCIES_DIR} ${ENTT_DIR})
+
 
 #To enable/disable spdlog logging
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -27,6 +31,7 @@ target_sources(${PROJECT_NAME}
     ${INCLUDE_DIR}/interfaces/ISystem.hpp
 )
 
+add_subdirectory(dependencies)
 add_subdirectory(src)
 add_subdirectory(tests)
 
@@ -34,7 +39,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     EnTT::EnTT
     ${LUA_LIBRARIES}
     nlohmann_json::nlohmann_json
-    sol2
     spdlog::spdlog)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR} ${DEPENDENCIES_DIR} ${LUA_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR} ${DEPENDENCIES_INCLUDE_DIR} ${ENTT_DIR} ${LUA_INCLUDE_DIR})

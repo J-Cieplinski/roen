@@ -36,7 +36,7 @@ template <int val>
 class StubAsset : public Asset<int>
 {
 public:
-    bool loadAsset(const std::string& path) override
+    bool loadAsset(const std::filesystem::path& path) override
     {
         asset_ = pathToVal.at(path);
 
@@ -57,7 +57,7 @@ private:
 class FloatStubAsset : public Asset<float>
 {
 public:
-    bool loadAsset(const std::string& path) override
+    bool loadAsset(const std::filesystem::path& path) override
     {
         return asset_;
     }

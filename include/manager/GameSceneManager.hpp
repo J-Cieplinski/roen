@@ -18,7 +18,7 @@ public:
     void pop();
     void switchScene(std::unique_ptr<interfaces::IScene> scene);
     void update();
-    [[nodiscard]] interfaces::IScene& getCurrentScene();
+    interfaces::IScene& getCurrentScene();
 private:
     std::stack<std::unique_ptr<interfaces::IScene>> scenes_;
     std::vector<std::unique_ptr<interfaces::IScene>> poppedScenes_;

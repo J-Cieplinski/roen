@@ -9,6 +9,8 @@ namespace roen::interfaces
 class IAsset
 {
 public:
+    virtual ~IAsset() = default;
+
     virtual bool loadAsset(const std::filesystem::path& path) = 0;
     virtual void freeAsset() = 0;
 };
