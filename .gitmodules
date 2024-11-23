@@ -9,4 +9,4 @@
 	url = git@github.com:gabime/spdlog.git
 [submodule "dependencies/tileson"]
 	path = dependencies/tileson
-	url = git@github.com:SSBMTonberry/tileson.git
+	url = git@github.com:J-Cieplinski/tileson.git
