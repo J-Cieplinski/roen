@@ -1,7 +1,6 @@
 #ifndef ROEN_LOG_FORMATTERS_ENTITY_HPP
 #define ROEN_LOG_FORMATTERS_ENTITY_HPP
 
-#include <fmt/core.h>
 #include <fmt/format.h>
 
 #include <entt/fwd.hpp>

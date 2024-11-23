@@ -3,11 +3,8 @@
 
 #include <data_structure/INode.hpp>
 
-#include <raymath.h>
-
 #include <cstdint>
 #include <fmt/ostream.h>
-#include <unordered_map>
 
 namespace roen::data_structure
 {

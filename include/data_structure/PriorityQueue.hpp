@@ -12,10 +12,10 @@ class PriorityQueue
 {
 public:
     using PQElement = std::pair<Priority, T>;
-    inline bool empty() const;
-    inline void insert(PQElement&& element);
-    inline void insert(const T& element, Priority priority);
-    inline T get();
+    bool empty() const;
+    void insert(PQElement&& element);
+    void insert(const T& element, Priority priority);
+    T get();
 private:
     std::priority_queue<PQElement, std::vector<PQElement>, std::greater<PQElement>> elements_;
 };

@@ -27,7 +27,7 @@ template<DerivedFromIAsset AssetType>
 class AssetManager : public IAssetManager
 {
 public:
-    ~AssetManager();
+    ~AssetManager() override;
 
     void loadAsset(const std::string& id, const std::filesystem::path& path) override;
     void freeAssets() override;
@@ -51,7 +51,7 @@ namespace roen::manager
 template<DerivedFromIAsset AssetType>
 AssetManager<AssetType>::~AssetManager()
 {
-    freeAssets();
+    AssetManager<AssetType>::freeAssets();
 }
 
 template<DerivedFromIAsset AssetType>

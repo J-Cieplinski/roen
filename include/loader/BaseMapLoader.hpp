@@ -38,6 +38,7 @@ class BaseMapLoader
 {
 public:
     explicit BaseMapLoader(entt::registry& entityManager);
+    virtual ~BaseMapLoader() = default;
 
     void loadMap(const std::filesystem::path& path);
     [[nodiscard]] const Vector2& getMapSize() const;
