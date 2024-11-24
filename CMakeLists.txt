@@ -34,6 +34,7 @@ target_sources(${PROJECT_NAME}
     ${INCLUDE_DIR}/interfaces/IAsset.hpp
     ${INCLUDE_DIR}/interfaces/IScene.hpp
     ${INCLUDE_DIR}/interfaces/ISystem.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/EntryPoint.hpp
 )
 
 add_subdirectory(dependencies)
@@ -42,7 +43,7 @@ add_subdirectory(tests)
 
 target_precompile_headers(${PROJECT_NAME}
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/roenpch.hpp
+    ${INCLUDE_DIR}/roenpch.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
