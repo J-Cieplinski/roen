@@ -22,6 +22,7 @@ public:
 private:
     std::stack<std::unique_ptr<interfaces::IScene>> scenes_;
     std::vector<std::unique_ptr<interfaces::IScene>> poppedScenes_;
+    std::vector<std::unique_ptr<interfaces::IScene>> delayedScenes_;
 };
 
 } // roen::manager

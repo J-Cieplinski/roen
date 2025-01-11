@@ -30,9 +30,10 @@ void Application::run()
     {
         isRunning_ = !WindowShouldClose();
         gameSceneManager_.update();
-        gameSceneManager_.getCurrentScene().handleInput();
-        gameSceneManager_.getCurrentScene().update();
-        gameSceneManager_.getCurrentScene().render();
+        auto& currentScene = gameSceneManager_.getCurrentScene();
+        currentScene.handleInput();
+        currentScene.update();
+        currentScene.render();
     }
 }
 

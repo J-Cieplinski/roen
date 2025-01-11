@@ -5,9 +5,9 @@
 #include <log/Logger.hpp>
 
 #include <filesystem>
-#include <map>
 #include <stdexcept>
 #include <typeindex>
+#include <unordered_map>
 
 namespace roen::manager
 {
@@ -33,7 +33,7 @@ public:
     void freeAssets() override;
     AssetType& getAsset(std::uint64_t id) const;
 private:
-    inline static std::map<std::uint64_t, AssetType> assets_;
+    inline static std::unordered_map<std::uint64_t, AssetType> assets_;
 };
 
 } // roen::manager
@@ -67,7 +67,8 @@ void AssetManager<AssetType>::freeAssets()
 template<DerivedFromIAsset AssetType>
 void AssetManager<AssetType>::loadAsset(const std::string &id, const std::filesystem::path& path)
 {
-    if(assets_.contains(hashString(id)))
+    auto hashedString = hashString(id);
+    if(assets_.contains(hashedString))
     {
         return;
     }
@@ -82,7 +83,7 @@ void AssetManager<AssetType>::loadAsset(const std::string &id, const std::filesy
         throw std::runtime_error(ss.str());
     }
 
-    assets_[hashString(id)] = asset;
+    assets_[hashedString] = asset;
 }
 
 template<DerivedFromIAsset AssetType>

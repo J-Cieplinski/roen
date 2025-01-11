@@ -30,12 +30,11 @@ void GameSceneManager::switchScene(std::unique_ptr<interfaces::IScene> scene)
 {
     if(!scenes_.empty())
     {
-        scenes_.top()->quit();
         poppedScenes_.emplace_back(std::move(scenes_.top()));
         scenes_.pop();
     }
 
-    scenes_.push(std::move(scene));
+    delayedScenes_.emplace_back(std::move(scene));
 }
 
 void GameSceneManager::pop()
@@ -65,11 +64,23 @@ interfaces::IScene& GameSceneManager::getCurrentScene()
 
 void GameSceneManager::update()
 {
-    if(!poppedScenes_.empty())
+    for(auto& poppedScene : poppedScenes_)
     {
-        poppedScenes_.clear();
+        poppedScene->quit();
+    }
+    poppedScenes_.clear();
+
+    for(auto& scene : delayedScenes_)
+    {
+        scenes_.push(std::move(scene));
+    }
+
+    if(!delayedScenes_.empty())
+    {
         scenes_.top()->revealed();
     }
+
+    delayedScenes_.clear();
 }
 
 } // roen::manager
