@@ -10,9 +10,10 @@ find_package(Lua REQUIRED)
 
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
+set(SPDLOG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spdlog/include)
 set(ENTT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/entt/src)
 set(RAYLIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/raylib/src)
-set(DEPENDENCIES_INCLUDE_DIR ${DEPENDENCIES_DIR} ${ENTT_DIR} ${RAYLIB_DIR})
+set(DEPENDENCIES_INCLUDE_DIR ${DEPENDENCIES_DIR} ${ENTT_DIR} ${RAYLIB_DIR} ${SPDLOG_DIR})
 
 
 #To enable/disable spdlog logging

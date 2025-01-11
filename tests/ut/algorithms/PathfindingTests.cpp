@@ -40,7 +40,7 @@ TEST_F(PathfindingTests, getNodeOrderFromPath_IfGoalDoesNotBelongToPathItShouldR
             {middleNode, startNode},
     };
 
-    const std::vector<data_structure::MapNode> EXPECTED_ORDER {};
+    constexpr std::vector<data_structure::MapNode> EXPECTED_ORDER {};
 
     EXPECT_EQ(getNodeOrderFromPath(startNode, endNode, path), EXPECTED_ORDER);
 }

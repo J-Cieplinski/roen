@@ -4,7 +4,8 @@
 #include <data_structure/INode.hpp>
 
 #include <cstdint>
-#include <fmt/ostream.h>
+
+#include <spdlog/fmt/bundled/ostream.h>
 
 namespace roen::data_structure
 {
