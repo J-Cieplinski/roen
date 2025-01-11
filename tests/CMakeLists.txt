@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.27)
 
 project(roen_tests LANGUAGES CXX)
 
+option(TEST_INSTALLED_VERSION "Test the version found by find_package" OFF)
+
 # --- Import tools ----
 
 include(../cmake/tools.cmake)
@@ -24,6 +26,7 @@ add_executable(${PROJECT_NAME})
 add_subdirectory(ut)
 
 target_link_libraries(${PROJECT_NAME}
+    PRIVATE
     roen::roen
     GTest::gtest
     GTest::gtest_main
