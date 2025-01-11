@@ -1,25 +1,51 @@
 cmake_minimum_required(VERSION 3.27)
 
-project(roen_tests)
+project(roen_tests LANGUAGES CXX)
 
-enable_testing()
+# --- Import tools ----
 
-find_package(GTest REQUIRED)
+include(../cmake/tools.cmake)
 
-add_executable(${PROJECT_NAME} main.cpp)
+# ---- Dependencies ----
+
+include(../cmake/CPM.cmake)
+
+CPMAddPackage("gh:google/googletest@1.15.2")
+CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
+
+if(TEST_INSTALLED_VERSION)
+    find_package(roen REQUIRED)
+else()
+    CPMAddPackage(NAME roen SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+endif()
+
+add_executable(${PROJECT_NAME})
+
+add_subdirectory(ut)
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE
+    roen::roen
     GTest::gtest
     GTest::gtest_main
     GTest::gmock
-    GTest::gmock_main
-    algorithms_ut
-    data_structure_ut
-    utils_ut
-    manager_ut)
+    GTest::gmock_main)
 
-add_subdirectory(ut)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
+
+# enable compiler warnings
+if(NOT TEST_INSTALLED_VERSION)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        target_compile_options(roen PUBLIC -Wall -Wpedantic -Wextra -Werror)
+    elseif(MSVC)
+        target_compile_options(roen PUBLIC /W4 /WX)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
+    endif()
+endif()
+
+enable_testing()
+
+include(GoogleTest)
+gtest_discover_tests(${PROJECT_NAME})
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD

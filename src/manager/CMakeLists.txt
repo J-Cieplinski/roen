@@ -1,5 +1,5 @@
 target_sources(${PROJECT_NAME}
-    PUBLIC
+    PRIVATE
     ${INCLUDE_DIR}/manager/AssetManager.hpp
     ${INCLUDE_DIR}/manager/GameSceneManager.hpp
     PRIVATE

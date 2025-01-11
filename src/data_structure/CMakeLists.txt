@@ -1,5 +1,5 @@
 target_sources(${PROJECT_NAME}
-    PUBLIC
+    PRIVATE
     ${INCLUDE_DIR}/data_structure/Graph.hpp
     ${INCLUDE_DIR}/data_structure/INode.hpp
     ${INCLUDE_DIR}/data_structure/MapNode.hpp

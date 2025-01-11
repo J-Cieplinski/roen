@@ -2,7 +2,7 @@
 
 #include <log/Logger.hpp>
 
-#include <json/single_include/nlohmann/json.hpp>
+#include <nlohmann/json.hpp>
 
 #include <ranges>
 #include <regex>

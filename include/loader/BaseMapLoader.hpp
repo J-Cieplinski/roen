@@ -7,9 +7,9 @@
 
 #include <entt/entity/registry.hpp>
 
-#include <json/single_include/nlohmann/json_fwd.hpp>
 #include <raymath.h>
-#include <tileson/tileson.hpp>
+#include <tileson.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include <filesystem>
 #include <regex>
