@@ -50,6 +50,8 @@ private:
     #define SDK_WARN(...)       roen::log::Logger::getSdkLogger()->warn(__VA_ARGS__)
     #define SDK_TRACE(...)      roen::log::Logger::getSdkLogger()->trace(__VA_ARGS__)
     #define SDK_CRITICAL(...)   roen::log::Logger::getSdkLogger()->critical(__VA_ARGS__)
+    #define SET_SDK_LOG_LEVEL(...)   roen::log::Logger::setSdkLogLevel(__VA_ARGS__)
+    #define GET_SDK_LOG_LEVEL()   roen::log::Logger::getSdkLogger()->level()
 
     //App log macros
     #define APP_ERROR(...)      roen::log::Logger::getAppLogger()->error(__VA_ARGS__)
@@ -57,12 +59,17 @@ private:
     #define APP_WARN(...)       roen::log::Logger::getAppLogger()->warn(__VA_ARGS__)
     #define APP_TRACE(...)      roen::log::Logger::getAppLogger()->trace(__VA_ARGS__)
     #define APP_CRITICAL(...)   roen::log::Logger::getAppLogger()->critical(__VA_ARGS__)
+    #define SET_APP_LOG_LEVEL(...)   roen::log::Logger::setAppLogLevel(__VA_ARGS__)
+    #define GET_APP_LOG_LEVEL()   roen::log::Logger::getAppLogger()->level()
+
 #else
     #define SDK_ERROR(...)
     #define SDK_INFO(...)
     #define SDK_WARN(...)
     #define SDK_TRACE(...)
     #define SDK_CRITICAL(...)
+    #define SET_SDK_LOG_LEVEL(...)
+    #define GET_SDK_LOG_LEVEL()   spdlog::level::off
 
     //App log macros
     #define APP_ERROR(...)
@@ -70,6 +77,8 @@ private:
     #define APP_WARN(...)
     #define APP_TRACE(...)
     #define APP_CRITICAL(...)
+    #define SET_APP_LOG_LEVEL(...)
+    #define GET_APP_LOG_LEVEL()   spdlog::level::off
 #endif //IS_DEBUG
 
 #endif  //ROEN_LOG_LOGGER_HPP
