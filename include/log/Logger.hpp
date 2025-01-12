@@ -44,6 +44,9 @@ private:
 } //roen::log
 
 //Sdk log macros
+#define LOG_LEVEL_INFO spdlog::level::info
+#define LOG_LEVEL_OFF spdlog::level::off
+
 #ifdef IS_DEBUG
     #define SDK_ERROR(...)      roen::log::Logger::getSdkLogger()->error(__VA_ARGS__)
     #define SDK_INFO(...)       roen::log::Logger::getSdkLogger()->info(__VA_ARGS__)
@@ -69,7 +72,7 @@ private:
     #define SDK_TRACE(...)
     #define SDK_CRITICAL(...)
     #define SET_SDK_LOG_LEVEL(...)
-    #define GET_SDK_LOG_LEVEL()   spdlog::level::off
+    #define GET_SDK_LOG_LEVEL()   LOG_LEVEL_INFO
 
     //App log macros
     #define APP_ERROR(...)
@@ -78,7 +81,7 @@ private:
     #define APP_TRACE(...)
     #define APP_CRITICAL(...)
     #define SET_APP_LOG_LEVEL(...)
-    #define GET_APP_LOG_LEVEL()   spdlog::level::off
+    #define GET_APP_LOG_LEVEL()   LOG_LEVEL_INFO
 #endif //IS_DEBUG
 
 #endif  //ROEN_LOG_LOGGER_HPP
