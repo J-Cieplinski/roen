@@ -24,7 +24,7 @@ Companing project to [**spielda**](https://github.com/J-Cieplinski/spielda) crea
 - [**raylib**](https://github.com/raysan5/raylib): raylib is a simple and easy-to-use library to enjoy videogames programming.
 - [**nlohmann_json**](https://github.com/nlohmann/json): json library
 - [**tileson**](https://github.com/SSBMTonberry/tileson): json-parser for C++, used for parsing Tiled maps
-- [**tileson**](https://github.com/gabime/spdlog/): Fast C++ logging library
+- [**spdlog**](https://github.com/gabime/spdlog/): Fast C++ logging library
 - [**GoogleTest**](https://github.com/google/googletest): Google's C++ test framework.
 
 ## Usage
