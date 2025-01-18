@@ -42,6 +42,7 @@ public:
 
     void loadMap(const std::filesystem::path& path);
     [[nodiscard]] const Vector2& getMapSize() const;
+    [[nodiscard]] const Vector2& getTileSize() const;
     const data_structure::Graph<data_structure::MapNode>& getGraph() const;
 protected:
     struct MapTile
@@ -56,6 +57,7 @@ protected:
     virtual manager::IAssetManager& getTextureManager() = 0;
 
     Vector2 mapSize_;
+    Vector2 tileSize_;
     entt::registry& entityManager_;
     inline static std::regex reg{"(\\.\\.)"};
     data_structure::Graph<data_structure::MapNode> pathfindingGraph_;

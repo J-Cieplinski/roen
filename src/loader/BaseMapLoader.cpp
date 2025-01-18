@@ -20,6 +20,7 @@ Vector2 toVector2(const tson::Vector2<T> v)
 
 BaseMapLoader::BaseMapLoader(entt::registry& entityManager)
     : mapSize_{0.f, 0.f}
+    , tileSize_{0.f, 0.f}
     , entityManager_{entityManager}
 {
 }
@@ -35,7 +36,7 @@ void BaseMapLoader::loadMap(const std::filesystem::path& path)
     mapSize_ = toVector2(map->getSize());
     std::vector<MapTile> mappedTiles{};
 
-    auto tileSize = toVector2(map->getTileSize());
+    tileSize_ = toVector2(map->getTileSize());
 
     auto& textureManager = getTextureManager();
 
@@ -74,11 +75,11 @@ void BaseMapLoader::loadMap(const std::filesystem::path& path)
 
                 auto rotation = getTileRotation(tile);
 
-                addComponents(tilePosition, tileSize, rotation, drawingRect, layerOrder, layerClass, assetId);
+                addComponents(tilePosition, tileSize_, rotation, drawingRect, layerOrder, layerClass, assetId);
             }
         }
 
-        createPathfindingGraph(mappedTiles, tileSize);
+        createPathfindingGraph(mappedTiles, tileSize_);
     }
 }
 
@@ -110,6 +111,11 @@ float BaseMapLoader::getTileRotation(tson::Tile *tile)
 const Vector2& BaseMapLoader::getMapSize() const
 {
     return mapSize_;
+}
+
+const Vector2& BaseMapLoader::getTileSize() const
+{
+    return tileSize_;
 }
 
 void BaseMapLoader::createPathfindingGraph(const std::vector<MapTile>& tiles, Vector2 tileSize)
