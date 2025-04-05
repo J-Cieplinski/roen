@@ -7,7 +7,7 @@
 namespace roen::data_structure
 {
 
-template<typename T, typename Priority>
+template <typename T, typename Priority>
 class PriorityQueue
 {
 public:
@@ -16,11 +16,12 @@ public:
     void insert(PQElement&& element);
     void insert(const T& element, Priority priority);
     T get();
+
 private:
     std::priority_queue<PQElement, std::vector<PQElement>, std::greater<PQElement>> elements_;
 };
 
-} // roen::data_structure
+}  // namespace roen::data_structure
 
 /*
  * Template implementation
@@ -29,7 +30,7 @@ private:
 namespace roen::data_structure
 {
 
-template<typename T, typename Priority>
+template <typename T, typename Priority>
 T PriorityQueue<T, Priority>::get()
 {
     auto topElement = elements_.top().second;
@@ -37,24 +38,24 @@ T PriorityQueue<T, Priority>::get()
     return topElement;
 }
 
-template<typename T, typename Priority>
+template <typename T, typename Priority>
 void PriorityQueue<T, Priority>::insert(PriorityQueue::PQElement&& element)
 {
     elements_.emplace(element);
 }
 
-template<typename T, typename Priority>
+template <typename T, typename Priority>
 void PriorityQueue<T, Priority>::insert(const T& element, Priority priority)
 {
     elements_.emplace({priority, element});
 }
 
-template<typename T, typename Priority>
+template <typename T, typename Priority>
 bool PriorityQueue<T, Priority>::empty() const
 {
     return elements_.empty();
 }
 
-} // roen::data_structure
+}  // namespace roen::data_structure
 
-#endif //ROEN_DATA_STRUCTURE_PRIORITYQUEUE_HPP
+#endif  // ROEN_DATA_STRUCTURE_PRIORITYQUEUE_HPP

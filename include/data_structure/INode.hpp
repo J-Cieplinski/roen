@@ -16,6 +16,6 @@ public:
     virtual std::uint32_t cost() const = 0;
 };
 
-} // roen::data_structure
+}  // namespace roen::data_structure
 
-#endif //ROEN_DATA_STRUCTURE_INODE_HPP
+#endif  // ROEN_DATA_STRUCTURE_INODE_HPP

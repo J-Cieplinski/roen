@@ -2,8 +2,8 @@
 #define ROEN_DATA_STRUCTURE_GRAPH_HPP
 
 #include <cstdint>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 namespace roen::data_structure
 {
@@ -18,6 +18,7 @@ public:
     inline std::uint32_t cost(const Node& startNode, const Node& destNode) const;
     void addNode(Node&& node, std::vector<Node>&& edges);
     void addNode(const Node& node, const std::vector<Node>& edges);
+
 private:
     std::unordered_map<Node, std::vector<Node>> edges_;
 };
@@ -26,42 +27,42 @@ private:
  * Template implementation
  */
 
-template<typename Node>
+template <typename Node>
 inline bool Graph<Node>::containsNode(const Node& node) const
 {
     return edges_.contains(node);
 }
 
-template<typename Node>
+template <typename Node>
 inline const std::unordered_map<Node, std::vector<Node>>& Graph<Node>::getEdges() const
 {
     return edges_;
 }
 
-template<typename Node>
+template <typename Node>
 inline const std::vector<Node>& Graph<Node>::neighbors(const Node& node) const
 {
     return edges_.at(node);
 }
 
-template<typename Node>
+template <typename Node>
 void Graph<Node>::addNode(Node&& node, std::vector<Node>&& edges)
 {
     edges_[node] = edges;
 }
 
-template<typename Node>
+template <typename Node>
 void Graph<Node>::addNode(const Node& node, const std::vector<Node>& edges)
 {
     edges_[node] = edges;
 }
 
-template<typename Node>
+template <typename Node>
 std::uint32_t Graph<Node>::cost(const Node& startNode, const Node& destNode) const
 {
     return startNode.cost() + destNode.cost();
 }
 
-} // roen::data_structure
+}  // namespace roen::data_structure
 
-#endif //ROEN_DATA_STRUCTURE_GRAPH_HPP
+#endif  // ROEN_DATA_STRUCTURE_GRAPH_HPP

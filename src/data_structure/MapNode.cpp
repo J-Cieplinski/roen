@@ -16,10 +16,8 @@ MapNode::MapNode(const Vector2& position, const Vector2& size, std::uint32_t cos
 
 bool MapNode::contains(const Vector2& entity) const
 {
-    return position_.x <= entity.x
-        && (position_.x + size_.x) >= entity.x
-        && position_.y <= entity.y
-        && (position_.y + size_.y) >= entity.y;
+    return position_.x <= entity.x && (position_.x + size_.x) >= entity.x && position_.y <= entity.y
+           && (position_.y + size_.y) >= entity.y;
 }
 
 std::uint32_t MapNode::cost() const
@@ -29,9 +27,8 @@ std::uint32_t MapNode::cost() const
 
 bool operator==(const MapNode& lhs, const MapNode& rhs)
 {
-    return lhs.position_ == rhs.position_
-        && lhs.size_ == rhs.size_
-        && lhs.movementCost_ == rhs.movementCost_;
+    return lhs.position_ == rhs.position_ && lhs.size_ == rhs.size_
+           && lhs.movementCost_ == rhs.movementCost_;
 }
 
 Vector2 MapNode::operator-(const MapNode& other) const
@@ -64,4 +61,4 @@ const Vector2& MapNode::getSize() const
     return size_;
 }
 
-} // roen::data_structure
+}  // namespace roen::data_structure

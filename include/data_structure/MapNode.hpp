@@ -26,6 +26,7 @@ public:
     const Vector2& getSize() const;
 
     friend std::ostream& operator<<(std::ostream& os, const MapNode& node);
+
 private:
     friend std::hash<MapNode>;
     Vector2 position_;
@@ -33,7 +34,7 @@ private:
     std::uint32_t movementCost_;
 };
 
-} // roen::data_structure
+}  // namespace roen::data_structure
 
 // Hashing
 template <>
@@ -48,6 +49,9 @@ struct std::hash<roen::data_structure::MapNode>
 };
 
 // For spdlog print support
-template <> struct fmt::formatter<roen::data_structure::MapNode> : ostream_formatter {};
+template <>
+struct fmt::formatter<roen::data_structure::MapNode> : ostream_formatter
+{
+};
 
-#endif //ROEN_DATA_STRUCTURE_MAPNODE_HPP
+#endif  // ROEN_DATA_STRUCTURE_MAPNODE_HPP

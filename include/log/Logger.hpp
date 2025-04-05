@@ -5,16 +5,16 @@
  * Workaround for raylib symbol clash with Windows symbols imported in spdlog
  */
 #if defined(_WIN32)
-#define NOGDI             // All GDI defines and routines
-#define NOUSER            // All USER defines and routines
+#    define NOGDI   // All GDI defines and routines
+#    define NOUSER  // All USER defines and routines
 #endif
 
-#include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
+#include <spdlog/spdlog.h>
 
-#if defined(_WIN32)           // raylib uses these names as function parameters
-#undef near
-#undef far
+#if defined(_WIN32)  // raylib uses these names as function parameters
+#    undef near
+#    undef far
 #endif
 /*
  * End of Workaround
@@ -41,47 +41,47 @@ private:
     inline static std::shared_ptr<spdlog::logger> appLogger_;
 };
 
-} //roen::log
+}  // namespace roen::log
 
-//Sdk log macros
+// Sdk log macros
 #define LOG_LEVEL_INFO spdlog::level::info
 #define LOG_LEVEL_OFF spdlog::level::off
 
 #ifdef IS_DEBUG
-    #define SDK_ERROR(...)      roen::log::Logger::getSdkLogger()->error(__VA_ARGS__)
-    #define SDK_INFO(...)       roen::log::Logger::getSdkLogger()->info(__VA_ARGS__)
-    #define SDK_WARN(...)       roen::log::Logger::getSdkLogger()->warn(__VA_ARGS__)
-    #define SDK_TRACE(...)      roen::log::Logger::getSdkLogger()->trace(__VA_ARGS__)
-    #define SDK_CRITICAL(...)   roen::log::Logger::getSdkLogger()->critical(__VA_ARGS__)
-    #define SET_SDK_LOG_LEVEL(...)   roen::log::Logger::setSdkLogLevel(__VA_ARGS__)
-    #define GET_SDK_LOG_LEVEL()   roen::log::Logger::getSdkLogger()->level()
+#    define SDK_ERROR(...) roen::log::Logger::getSdkLogger()->error(__VA_ARGS__)
+#    define SDK_INFO(...) roen::log::Logger::getSdkLogger()->info(__VA_ARGS__)
+#    define SDK_WARN(...) roen::log::Logger::getSdkLogger()->warn(__VA_ARGS__)
+#    define SDK_TRACE(...) roen::log::Logger::getSdkLogger()->trace(__VA_ARGS__)
+#    define SDK_CRITICAL(...) roen::log::Logger::getSdkLogger()->critical(__VA_ARGS__)
+#    define SET_SDK_LOG_LEVEL(...) roen::log::Logger::setSdkLogLevel(__VA_ARGS__)
+#    define GET_SDK_LOG_LEVEL() roen::log::Logger::getSdkLogger()->level()
 
-    //App log macros
-    #define APP_ERROR(...)      roen::log::Logger::getAppLogger()->error(__VA_ARGS__)
-    #define APP_INFO(...)       roen::log::Logger::getAppLogger()->info(__VA_ARGS__)
-    #define APP_WARN(...)       roen::log::Logger::getAppLogger()->warn(__VA_ARGS__)
-    #define APP_TRACE(...)      roen::log::Logger::getAppLogger()->trace(__VA_ARGS__)
-    #define APP_CRITICAL(...)   roen::log::Logger::getAppLogger()->critical(__VA_ARGS__)
-    #define SET_APP_LOG_LEVEL(...)   roen::log::Logger::setAppLogLevel(__VA_ARGS__)
-    #define GET_APP_LOG_LEVEL()   roen::log::Logger::getAppLogger()->level()
+// App log macros
+#    define APP_ERROR(...) roen::log::Logger::getAppLogger()->error(__VA_ARGS__)
+#    define APP_INFO(...) roen::log::Logger::getAppLogger()->info(__VA_ARGS__)
+#    define APP_WARN(...) roen::log::Logger::getAppLogger()->warn(__VA_ARGS__)
+#    define APP_TRACE(...) roen::log::Logger::getAppLogger()->trace(__VA_ARGS__)
+#    define APP_CRITICAL(...) roen::log::Logger::getAppLogger()->critical(__VA_ARGS__)
+#    define SET_APP_LOG_LEVEL(...) roen::log::Logger::setAppLogLevel(__VA_ARGS__)
+#    define GET_APP_LOG_LEVEL() roen::log::Logger::getAppLogger()->level()
 
 #else
-    #define SDK_ERROR(...)
-    #define SDK_INFO(...)
-    #define SDK_WARN(...)
-    #define SDK_TRACE(...)
-    #define SDK_CRITICAL(...)
-    #define SET_SDK_LOG_LEVEL(...)
-    #define GET_SDK_LOG_LEVEL()   LOG_LEVEL_INFO
+#    define SDK_ERROR(...)
+#    define SDK_INFO(...)
+#    define SDK_WARN(...)
+#    define SDK_TRACE(...)
+#    define SDK_CRITICAL(...)
+#    define SET_SDK_LOG_LEVEL(...)
+#    define GET_SDK_LOG_LEVEL() LOG_LEVEL_INFO
 
-    //App log macros
-    #define APP_ERROR(...)
-    #define APP_INFO(...)
-    #define APP_WARN(...)
-    #define APP_TRACE(...)
-    #define APP_CRITICAL(...)
-    #define SET_APP_LOG_LEVEL(...)
-    #define GET_APP_LOG_LEVEL()   LOG_LEVEL_INFO
-#endif //IS_DEBUG
+// App log macros
+#    define APP_ERROR(...)
+#    define APP_INFO(...)
+#    define APP_WARN(...)
+#    define APP_TRACE(...)
+#    define APP_CRITICAL(...)
+#    define SET_APP_LOG_LEVEL(...)
+#    define GET_APP_LOG_LEVEL() LOG_LEVEL_INFO
+#endif  // IS_DEBUG
 
-#endif  //ROEN_LOG_LOGGER_HPP
+#endif  // ROEN_LOG_LOGGER_HPP

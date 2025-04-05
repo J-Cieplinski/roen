@@ -21,9 +21,12 @@ class Asset : public IAsset
 public:
     virtual ~Asset() = default;
     virtual AssetType get() const = 0;
-    operator AssetType() const { return get(); };
+    operator AssetType() const
+    {
+        return get();
+    };
 };
 
-} // roen::interfaces
+}  // namespace roen::interfaces
 
-#endif //ROEN_INTERFACES_IASSET_HPP
+#endif  // ROEN_INTERFACES_IASSET_HPP

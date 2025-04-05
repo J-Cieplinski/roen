@@ -17,7 +17,7 @@ void Logger::Init()
 
 void Logger::setSdkLogLevel(spdlog::level::level_enum level)
 {
-    if(!sdkLogger_)
+    if (!sdkLogger_)
     {
         throw std::runtime_error("SDK LOGGER was not initialized");
     }
@@ -26,7 +26,7 @@ void Logger::setSdkLogLevel(spdlog::level::level_enum level)
 
 void Logger::setAppLogLevel(spdlog::level::level_enum level)
 {
-    if(!appLogger_)
+    if (!appLogger_)
     {
         throw std::runtime_error("APP LOGGER was not initialized");
     }
@@ -35,7 +35,7 @@ void Logger::setAppLogLevel(spdlog::level::level_enum level)
 
 std::shared_ptr<spdlog::logger>& Logger::getSdkLogger()
 {
-    if(!sdkLogger_)
+    if (!sdkLogger_)
     {
         throw std::runtime_error("SDK LOGGER was not initialized");
     }
@@ -44,11 +44,11 @@ std::shared_ptr<spdlog::logger>& Logger::getSdkLogger()
 
 std::shared_ptr<spdlog::logger>& Logger::getAppLogger()
 {
-    if(!appLogger_)
+    if (!appLogger_)
     {
         throw std::runtime_error("APP LOGGER was not initialized");
     }
     return appLogger_;
 };
 
-} //roen::log
+}  // namespace roen::log

@@ -6,7 +6,7 @@
 namespace roen::manager
 {
 class GameSceneManager;
-} // roen::manager
+}  // namespace roen::manager
 
 namespace roen::interfaces
 {
@@ -33,6 +33,6 @@ protected:
     data_structure::SystemsContainer systems_;
 };
 
-} // roen::interfaces
+}  // namespace roen::interfaces
 
-#endif //ROEN_INTERFACES_ISCENE_HPP
+#endif  // ROEN_INTERFACES_ISCENE_HPP

@@ -32,4 +32,4 @@ SystemsContainer::SystemsConstIterator SystemsContainer::cend() const
 {
     return systems_.cend();
 }
-} // roen::data_structure
+}  // namespace roen::data_structure

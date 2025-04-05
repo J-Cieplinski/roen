@@ -10,9 +10,9 @@
 
 #include <raylib.h>
 #include <raymath.h>
+#include <spdlog/spdlog.h>
 #include <entt/entt.hpp>
 #include <nlohmann/json.hpp>
-#include <spdlog/spdlog.h>
 #include <tileson/tileson.hpp>
 
 #include <Utils.hpp>
@@ -32,5 +32,4 @@
 #include <manager/AssetManager.hpp>
 #include <manager/GameSceneManager.hpp>
 
-
-#endif //ROEN_ROENPCH_HPP
+#endif  // ROEN_ROENPCH_HPP

@@ -17,11 +17,11 @@ public:
 
 inline auto formatter<entt::entity>::format(entt::entity entity, format_context& ctx) const
 {
-    string_view enttStr {std::to_string(static_cast<std::uint32_t>(entity))};
+    string_view enttStr{std::to_string(static_cast<std::uint32_t>(entity))};
 
     return formatter<string_view>::format(enttStr, ctx);
 }
 
-} // namespace fmt
+}  // namespace fmt
 
-#endif //ROEN_LOG_FORMATTERS_ENTITY_HPP
+#endif  // ROEN_LOG_FORMATTERS_ENTITY_HPP

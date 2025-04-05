@@ -15,10 +15,11 @@ public:
     }
 
     virtual ~ISystem() = default;
+
 protected:
     entt::registry& entityManager_;
 };
 
-} // roen::interfaces
+}  // namespace roen::interfaces
 
-#endif //ROEN_INTERFACES_ISYSTEM_HPP
+#endif  // ROEN_INTERFACES_ISYSTEM_HPP

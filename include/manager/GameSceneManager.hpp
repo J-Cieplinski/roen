@@ -19,12 +19,13 @@ public:
     void switchScene(std::unique_ptr<interfaces::IScene> scene);
     void update();
     interfaces::IScene& getCurrentScene();
+
 private:
     std::stack<std::unique_ptr<interfaces::IScene>> scenes_;
     std::vector<std::unique_ptr<interfaces::IScene>> poppedScenes_;
     std::vector<std::unique_ptr<interfaces::IScene>> delayedScenes_;
 };
 
-} // roen::manager
+}  // namespace roen::manager
 
-#endif //ROEN_MANAGER_GAMESCENEMANAGER_HPP
+#endif  // ROEN_MANAGER_GAMESCENEMANAGER_HPP

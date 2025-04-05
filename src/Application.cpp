@@ -5,7 +5,8 @@
 namespace roen
 {
 
-Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight, const std::string& windowTitle)
+Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
+                         const std::string& windowTitle)
     : isRunning_{true}
 {
 #ifdef IS_DEBUG
@@ -26,7 +27,7 @@ void Application::run()
 {
     APP_INFO("Started main loop");
 
-    while(isRunning_)
+    while (isRunning_)
     {
         isRunning_ = !WindowShouldClose();
         gameSceneManager_.update();
@@ -37,4 +38,4 @@ void Application::run()
     }
 }
 
-} // roen
+}  // namespace roen

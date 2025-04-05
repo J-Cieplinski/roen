@@ -12,7 +12,7 @@
 namespace roen::manager
 {
 
-template<typename AssetType>
+template <typename AssetType>
 concept DerivedFromIAsset = std::is_base_of_v<interfaces::IAsset, AssetType>;
 
 class IAssetManager
@@ -23,7 +23,7 @@ public:
     virtual void freeAssets() = 0;
 };
 
-template<DerivedFromIAsset AssetType>
+template <DerivedFromIAsset AssetType>
 class AssetManager : public IAssetManager
 {
 public:
@@ -32,12 +32,12 @@ public:
     void loadAsset(const std::string& id, const std::filesystem::path& path) override;
     void freeAssets() override;
     AssetType& getAsset(std::uint64_t id) const;
+
 private:
     inline static std::unordered_map<std::uint64_t, AssetType> assets_;
 };
 
-} // roen::manager
-
+}  // namespace roen::manager
 
 /*
  * Template definition
@@ -48,34 +48,34 @@ private:
 namespace roen::manager
 {
 
-template<DerivedFromIAsset AssetType>
+template <DerivedFromIAsset AssetType>
 AssetManager<AssetType>::~AssetManager()
 {
     AssetManager<AssetType>::freeAssets();
 }
 
-template<DerivedFromIAsset AssetType>
+template <DerivedFromIAsset AssetType>
 void AssetManager<AssetType>::freeAssets()
 {
-    for(auto& [guid, asset] : assets_)
+    for (auto& [guid, asset] : assets_)
     {
         asset.freeAsset();
     }
     assets_.clear();
 }
 
-template<DerivedFromIAsset AssetType>
-void AssetManager<AssetType>::loadAsset(const std::string &id, const std::filesystem::path& path)
+template <DerivedFromIAsset AssetType>
+void AssetManager<AssetType>::loadAsset(const std::string& id, const std::filesystem::path& path)
 {
     auto hashedString = hashString(id);
-    if(assets_.contains(hashedString))
+    if (assets_.contains(hashedString))
     {
         return;
     }
 
     AssetType asset;
 
-    if(!asset.loadAsset(path))
+    if (!asset.loadAsset(path))
     {
         std::stringstream ss;
         ss << "Failed to open asset with path: " << path << " and id: " << id;
@@ -86,7 +86,7 @@ void AssetManager<AssetType>::loadAsset(const std::string &id, const std::filesy
     assets_[hashedString] = asset;
 }
 
-template<DerivedFromIAsset AssetType>
+template <DerivedFromIAsset AssetType>
 AssetType& AssetManager<AssetType>::getAsset(std::uint64_t id) const
 {
     try
@@ -100,6 +100,6 @@ AssetType& AssetManager<AssetType>::getAsset(std::uint64_t id) const
     }
 }
 
-} // roen::manager
+}  // namespace roen::manager
 
-#endif //SPIELDA_ASSETMANAGER_HPP
+#endif  // SPIELDA_ASSETMANAGER_HPP
