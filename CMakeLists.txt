@@ -52,6 +52,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     ${LUA_LIBRARIES}
     nlohmann_json::nlohmann_json
     raylib
-    spdlog::spdlog)
+    spdlog::spdlog
+    box2d)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR} ${DEPENDENCIES_INCLUDE_DIR} ${ENTT_DIR} ${LUA_INCLUDE_DIR})

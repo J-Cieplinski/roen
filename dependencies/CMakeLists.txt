@@ -1,3 +1,4 @@
+add_subdirectory(box2d)
 add_subdirectory(entt)
 add_subdirectory(json)
 add_subdirectory(raylib)

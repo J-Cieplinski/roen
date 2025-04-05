@@ -13,3 +13,6 @@
 [submodule "dependencies/raylib"]
 	path = dependencies/raylib
 	url = git@github.com:raysan5/raylib.git
+[submodule "dependencies/box2d"]
+	path = dependencies/box2d
+	url = git@github.com:erincatto/box2d.git
