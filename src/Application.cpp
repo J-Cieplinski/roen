@@ -29,12 +29,20 @@ void Application::run()
 
     while (isRunning_)
     {
-        isRunning_ = !WindowShouldClose();
-        gameSceneManager_.update();
-        auto& currentScene = gameSceneManager_.getCurrentScene();
-        currentScene.handleInput();
-        currentScene.update();
-        currentScene.render();
+        try
+        {
+            isRunning_ = !WindowShouldClose();
+            gameSceneManager_.update();
+            auto& currentScene = gameSceneManager_.getCurrentScene();
+            currentScene.handleInput();
+            currentScene.update();
+            currentScene.render();
+        }
+        catch (std::exception& e)
+        {
+            APP_CRITICAL(e.what());
+            return;
+        }
     }
 }
 
