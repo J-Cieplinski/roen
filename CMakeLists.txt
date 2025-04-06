@@ -23,6 +23,7 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -fsanitize=undefined -fsanitize=address")
         target_link_options(${PROJECT_NAME} BEFORE PUBLIC -fsanitize=undefined PUBLIC -fsanitize=address)
     endif (UNIX)
+    add_subdirectory(tests)
 endif ()
 
 if(UNIX)
@@ -40,7 +41,6 @@ target_sources(${PROJECT_NAME}
 
 add_subdirectory(dependencies)
 add_subdirectory(src)
-add_subdirectory(tests)
 
 target_precompile_headers(${PROJECT_NAME}
     PUBLIC
