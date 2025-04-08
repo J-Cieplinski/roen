@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <string>
 
+#include <raylib.h>
+#include <raymath.h>
+
 namespace roen
 {
 
@@ -43,6 +46,23 @@ public:
     virtual ~Functor() = default;
     virtual void operator()() = 0;
 };
+
+inline Vector2 getVirtualMousePosition(std::uint32_t renderWidth, std::uint32_t renderHeight)
+{
+    const auto screenWidth = GetScreenWidth();
+    const auto screenHeight = GetScreenHeight();
+    const float scale{std::min(static_cast<float>(screenWidth) / renderWidth,
+                               static_cast<float>(screenHeight) / renderHeight)};
+
+    const auto [mouseX, mouseY] = GetMousePosition();
+    const Vector2 virtualMousePosition{
+        .x = (mouseX - (static_cast<float>(screenWidth) - (renderWidth * scale)) * 0.5f) / scale,
+        .y = (mouseY - (static_cast<float>(screenHeight) - (renderHeight * scale)) * 0.5f) / scale,
+    };
+
+    return Vector2Clamp(virtualMousePosition, Vector2Zero(),
+                        Vector2{static_cast<float>(renderWidth), static_cast<float>(renderHeight)});
+}
 
 #ifdef __GNUC__
 }  // roen
