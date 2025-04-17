@@ -1,4 +1,5 @@
 add_subdirectory(algorithms)
+add_subdirectory(core)
 add_subdirectory(data_structure)
 add_subdirectory(loader)
 add_subdirectory(log)
