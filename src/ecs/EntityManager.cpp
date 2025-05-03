@@ -20,8 +20,8 @@ EntityManager::EntityManager()
 Entity EntityManager::createEntity()
 {
     Entity entity{registry_.create(), *this};
+    SDK_INFO("Created entity {}", entity);
     entity.addComponent<components::TransformComponent>();
-    APP_INFO("Created entity {}", entity);
 
     return entity;
 }

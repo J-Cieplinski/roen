@@ -1,5 +1,7 @@
 #include <lua/LuaManager.hpp>
 
+#include <lua/scripts/LuaEventHandler.hpp>
+
 #include <core/Input.hpp>
 #include <core/KeyCodes.hpp>
 
@@ -15,6 +17,10 @@
 #include <events/KeyEvent.hpp>
 #include <events/MouseEvent.hpp>
 
+#include <log/Logger.hpp>
+
+#include <Utils.hpp>
+
 namespace roen::lua
 {
 
@@ -25,11 +31,11 @@ namespace roen::lua
     {                                                                                             \
         namespace component = ecs::components;                                                    \
         auto entity_type = curLuaState["Entity"].get_or_create<sol::usertype<ecs::Entity>>();     \
-        entity_type.set_function(CONCAT(Remove, Comp),                                            \
+        entity_type.set_function(CONCAT(remove, Comp),                                            \
                                  &ecs::Entity::removeComponent<component::Comp>);                 \
-        entity_type.set_function(CONCAT(Get, Comp), &ecs::Entity::getComponent<component::Comp>); \
-        entity_type.set_function(CONCAT(Add, Comp), &ecs::Entity::addComponent<component::Comp>); \
-        entity_type.set_function(CONCAT(Has, Comp), &ecs::Entity::hasComponent<component::Comp>); \
+        entity_type.set_function(CONCAT(get, Comp), &ecs::Entity::getComponent<component::Comp>); \
+        entity_type.set_function(CONCAT(add, Comp), &ecs::Entity::addComponent<component::Comp>); \
+        entity_type.set_function(CONCAT(has, Comp), &ecs::Entity::hasComponent<component::Comp>); \
     }
 
 LuaManager::~LuaManager()
@@ -39,26 +45,34 @@ LuaManager::~LuaManager()
 
 LuaManager& LuaManager::Instance()
 {
-    if (instance_)
+    if (not instance_)
     {
-        return *instance_;
+        instance_ = std::unique_ptr<LuaManager>(new LuaManager());
     }
-
-    InitLua();
-    InitLuaInput();
-    InitLuaLog();
-    InitLuaEventHandler();
-    InitRaylibTypes();
-    InitEventTypes();
 
     return *instance_;
 }
 
+void LuaManager::onInit(interfaces::Scene* scene)
+{
+    scene_ = scene;
+    InitLua();
+    InitLuaInput();
+    InitLuaLog();
+    InitEventTypes();
+    InitECS();
+    InitScene();
+    InitRaylibTypes();
+    InitLuaEventHandler();
+    InitUtils();
+}
+
 void LuaManager::InitLua()
 {
-    instance_ = std::unique_ptr<LuaManager>(new LuaManager());
     instance_->lua_.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math,
                                    sol::lib::table, sol::lib::os, sol::lib::string);
+
+    instance_->lua_.set("scene", instance_->scene_);
 }
 
 void LuaManager::InitLuaInput()
@@ -212,26 +226,68 @@ void LuaManager::InitLuaInput()
     instance_->lua_.new_enum<roen::KeyCodes::MouseButton, false>("MouseButton", mouseItems);
 }
 
+#ifdef IS_DEBUG
+#    define SET_LOGGER_FUNC(level, name)                                      \
+        input.set_function(#name,                                             \
+                           [&state](sol::variadic_args va) -> void            \
+                           {                                                  \
+                               std::string result;                            \
+                               sol::function luaToString = state["tostring"]; \
+                               for (auto&& arg : va)                          \
+                               {                                              \
+                                   sol::object str = luaToString(arg);        \
+                                   result += str.as<std::string>() + " ";     \
+                               }                                              \
+                                                                              \
+                               level(result);                                 \
+                           });
+#else
+#    define SET_LOGGER_FUNC(level, name) \
+        input.set_function(#name, [](sol::variadic_args va) { level(va); });
+#endif  // IS_DEBUG
+
 void LuaManager::InitLuaLog()
 {
     auto input = instance_->lua_["Logger"].get_or_create<sol::table>();
+    auto& state = instance_->lua_;
 
-    input.set_function("Error", [](const std::string& msg) -> void { LUA_ERROR(msg); });
-    input.set_function("Info", [](const std::string& msg) -> void { LUA_INFO(msg); });
-    input.set_function("Warn", [](const std::string& msg) -> void { LUA_WARN(msg); });
-    input.set_function("Trace", [](const std::string& msg) -> void { LUA_TRACE(msg); });
-    input.set_function("Critical", [](const std::string& msg) -> void { LUA_CRITICAL(msg); });
+    SET_LOGGER_FUNC(LUA_ERROR, Error)
+    SET_LOGGER_FUNC(LUA_INFO, Info)
+    SET_LOGGER_FUNC(LUA_WARN, Warn)
+    SET_LOGGER_FUNC(LUA_TRACE, Trace)
+    SET_LOGGER_FUNC(LUA_CRITICAL, Critical)
 }
 
 void LuaManager::InitRaylibTypes()
 {
-    instance_->lua_.new_usertype<Vector2>("Vector2", "x", &Vector2::x, "y", &Vector2::y);
+    auto vec2 = instance_->lua_.new_usertype<Vector2>(
+        "Vector2", sol::constructors<Vector2(float, float)>(), sol::meta_function::to_string,
+        [](const Vector2& vec) -> std::string
+        { return "Vector2 {x: " + std::to_string(vec.x) + " y: " + std::to_string(vec.y) + "}"; });
+
+    vec2["x"] = &Vector2::x;
+    vec2["y"] = &Vector2::y;
+
+    auto rec = instance_->lua_.new_usertype<Rectangle>(
+        "Rectangle", sol::constructors<Rectangle(float, float, float, float)>(),
+        sol::meta_function::to_string,
+        [](const Rectangle& rec) -> std::string
+        {
+            return "Rectangle {x: " + std::to_string(rec.x) + " y: " + std::to_string(rec.y)
+                   + " width: " + std::to_string(rec.width)
+                   + " height: " + std::to_string(rec.height) + "}";
+        });
+
+    rec["x"] = &Rectangle::x;
+    rec["y"] = &Rectangle::y;
+    rec["width"] = &Rectangle::width;
+    rec["height"] = &Rectangle::height;
 }
 
 void LuaManager::InitLuaEventHandler()
 {
-    instance_->luaEventManager_ = LuaCallable(instance_->lua_, "EventHandler", "handleEvents",
-                                              "assets/scripts/game/EventHandler.lua");
+    instance_->luaEventManager_
+        = LuaCallable(instance_->lua_, "EventHandler", "handleEvents", scripts::EventHandlerScript);
 
     instance_->luaEventManager_.registerAsGlobal(instance_->lua_, "gEventHandler");
 }
@@ -239,7 +295,7 @@ void LuaManager::InitLuaEventHandler()
 void LuaManager::InitECS()
 {
     auto entityManager = instance_->lua_.new_usertype<ecs::EntityManager>("EntityManager");
-    entityManager.set_function("CreateEntity", &ecs::EntityManager::createEntity);
+    entityManager.set_function("createEntity", &ecs::EntityManager::createEntity);
 
     auto entity = instance_->lua_.new_usertype<ecs::Entity>(
         "Entity", sol::constructors<sol::types<entt::entity, entt::registry&>>());
@@ -250,8 +306,36 @@ void LuaManager::InitECS()
         "GraphicsComponent",
         sol::constructors<sol::types<const std::string&, Rectangle>,
                           sol::types<const std::string&, Rectangle, std::uint8_t>>());
+
+    graphicsComponent["srcRectangle"] = &ecs::components::GraphicsComponent::srcRectangle;
+    graphicsComponent["zLayer"] = &ecs::components::GraphicsComponent::zLayer;
+    graphicsComponent["guid"] = &ecs::components::GraphicsComponent::guid;
+
     REGISTER_COMPONENT_WITH_ECS(instance_->lua_, GraphicsComponent);
+
+    auto transformComponent = instance_->lua_.new_usertype<ecs::components::TransformComponent>(
+        "TransformComponent", sol::constructors<sol::types<Vector2>>());
+
+    transformComponent["transform"] = &ecs::components::TransformComponent::transform;
+
     REGISTER_COMPONENT_WITH_ECS(instance_->lua_, TransformComponent);
+
+    auto factionComponent = instance_->lua_.new_usertype<ecs::components::FactionComponent>(
+        "FactionComponent", sol::constructors<sol::types<std::bitset<8>>>());
+
+    factionComponent["factionMask"] = &ecs::components::FactionComponent::factionMask;
+    REGISTER_COMPONENT_WITH_ECS(instance_->lua_, FactionComponent);
+}
+
+void LuaManager::InitScene()
+{
+    auto scene = instance_->lua_.new_usertype<interfaces::Scene>("Scene");
+    scene.set_function("getEntityManager", &interfaces::Scene::getEntityManager);
+}
+
+void LuaManager::InitUtils()
+{
+    auto scene = instance_->lua_.set_function("hashString", &hashString);
 }
 
 void LuaManager::InitEventTypes()

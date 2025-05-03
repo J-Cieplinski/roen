@@ -3,6 +3,8 @@
 
 #include <lua/LuaCallable.hpp>
 
+#include <interfaces/Scene.hpp>
+
 #include <memory>
 
 #include <sol2/sol.hpp>
@@ -21,6 +23,8 @@ public:
     LuaManager(LuaManager&&) = delete;
 
     ~LuaManager();
+
+    void onInit(interfaces::Scene* scene);
 
     template <typename... Args>
     void registerUpdateable(std::string_view className, std::string_view fnName,
@@ -42,14 +46,17 @@ private:
     static void InitLuaLog();
     static void InitEventTypes();
     static void InitECS();
+    static void InitScene();
     static void InitRaylibTypes();
     static void InitLuaEventHandler();
+    static void InitUtils();
 
     inline static std::unique_ptr<LuaManager> instance_;
     sol::state lua_;
     std::vector<LuaCallable> updateables_;
     LuaCallable luaEventManager_;
     LuaCallable luaGameManager_;
+    interfaces::Scene* scene_;
 };
 
 }  // namespace roen::lua

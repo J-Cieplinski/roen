@@ -22,6 +22,7 @@ void GameSceneManager::push(std::unique_ptr<interfaces::Scene> scene)
         scenes_.top()->obscured();
     }
 
+    scene->onInit();
     scene->revealed();
     scenes_.push(std::move(scene));
 }
@@ -72,6 +73,7 @@ void GameSceneManager::update()
 
     for (auto& scene : delayedScenes_)
     {
+        scene->onInit();
         scenes_.push(std::move(scene));
     }
 

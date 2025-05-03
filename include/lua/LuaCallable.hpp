@@ -19,6 +19,10 @@ public:
                 const std::filesystem::path& script, Args&&... args);
 
     template <typename... Args>
+    LuaCallable(sol::state& luaState, std::string_view className, std::string_view fnName,
+                std::string_view script, Args&&... args);
+
+    template <typename... Args>
     void call(Args&&... args);
 
     template <typename... Args>
@@ -88,6 +92,56 @@ LuaCallable::LuaCallable(sol::state& luaState, std::string_view className, std::
     {
         APP_WARN("Function \"{}\" not found for class \"{}\" in script \"{}\"", fnName, className,
                  script.c_str());
+        return;
+    }
+}
+
+template <typename... Args>
+LuaCallable::LuaCallable(sol::state& luaState, std::string_view className, std::string_view fnName,
+                         std::string_view script, Args&&... args)
+{
+    try
+    {
+        luaState.script(script);
+    }
+    catch (const sol::error& e)
+    {
+        APP_WARN("Error loading script: {}", script);
+        return;
+    }
+
+    sol::table classTable = luaState[className];
+    if (not classTable.valid())
+    {
+        APP_WARN("Class: {} not found in script: {}", className, script);
+        return;
+    }
+
+    constexpr std::string_view constructorName{"create"};
+
+    sol::function constructor = classTable[constructorName];
+    if (not constructor.valid())
+    {
+        APP_WARN("Constructor \"{}\" not found in class \"{}\"", constructorName, className);
+        return;
+    }
+
+    sol::object classInstance = constructor(classTable, std::forward<Args>(args)...);
+    if (not classInstance.valid())
+    {
+        APP_WARN(
+            "Constructor \"{}\" for class \"{}\" in script \"{}\" failed to create class instance",
+            constructorName, className, script);
+        return;
+    }
+
+    self_ = classInstance.as<sol::table>();
+
+    function_ = self_[fnName];
+    if (not function_.valid())
+    {
+        APP_WARN("Function \"{}\" not found for class \"{}\" in script \"{}\"", fnName, className,
+                 script);
         return;
     }
 }

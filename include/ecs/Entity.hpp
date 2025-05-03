@@ -3,6 +3,9 @@
 
 #include <interfaces/Scene.hpp>
 
+#include <Utils.hpp>
+#include <log/formatters/entity.hpp>
+
 #include <entt/entity/fwd.hpp>
 
 #include <expected>
@@ -60,6 +63,8 @@ template <typename Component, typename... Args>
 Component& Entity::addComponent(Args... args)
 {
     Component comp(std::forward<Args>(args)...);
+    SDK_INFO("Adding component: {} to entity: {}",
+             getDemangledName(std::type_index(typeid(Component)).name()), entity_);
     return registry_.emplace<Component>(entity_, comp);
 }
 
@@ -114,9 +119,8 @@ public:
 inline auto formatter<roen::ecs::Entity>::format(roen::ecs::Entity entity,
                                                  format_context& ctx) const
 {
-    string_view enttStr{std::to_string(static_cast<std::uint32_t>(entity))};
-
-    return formatter<string_view>::format(enttStr, ctx);
+    formatter<entt::entity> entityFormat;
+    return entityFormat.format(static_cast<entt::entity>(entity), ctx);
 }
 
 template <>

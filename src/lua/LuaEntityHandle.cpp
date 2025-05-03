@@ -7,6 +7,11 @@
 namespace roen::lua
 {
 
+LuaEntityHandle::LuaEntityHandle(ecs::Entity& entity)
+    : entity_{entity}
+{
+}
+
 void LuaEntityHandle::setTransform(std::uint32_t x, std::uint32_t y)
 {
     auto transform = entity_.getComponentMaybe<ecs::components::TransformComponent>();

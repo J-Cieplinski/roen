@@ -32,7 +32,7 @@ struct FactionComponent
         return factionMask == other.factionMask;
     }
 
-    std::bitset<8> factionMask{"0b00000000"};
+    std::bitset<8> factionMask;
 };
 
 }  // namespace roen::ecs::components

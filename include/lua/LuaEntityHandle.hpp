@@ -11,6 +11,7 @@ namespace roen::lua
 class LuaEntityHandle
 {
 public:
+    LuaEntityHandle(ecs::Entity& entity);
     void setTransform(std::uint32_t x, std::uint32_t y);
 
 private:

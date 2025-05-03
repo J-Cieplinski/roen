@@ -7,4 +7,5 @@ target_sources(${PROJECT_NAME}
     ${INCLUDE_DIR}/lua/LuaCallable.hpp
     ${INCLUDE_DIR}/lua/LuaEntityHandle.hpp
     ${INCLUDE_DIR}/lua/LuaManager.hpp
+    ${INCLUDE_DIR}/lua/scripts/LuaEventHandler.hpp
 )
