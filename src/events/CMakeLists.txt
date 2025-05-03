@@ -1,0 +1,10 @@
+target_sources(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/EventHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/EventQueue.cpp
+    PUBLIC
+    ${INCLUDE_DIR}/events/Event.hpp
+    ${INCLUDE_DIR}/events/EventHandler.hpp
+    ${INCLUDE_DIR}/events/EventQueue.hpp
+    ${INCLUDE_DIR}/events/MouseEvent.hpp
+)

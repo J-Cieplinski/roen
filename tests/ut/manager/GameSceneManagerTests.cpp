@@ -1,6 +1,6 @@
 #include <manager/GameSceneManager.hpp>
 
-#include <interfaces/IScene.hpp>
+#include <interfaces/Scene.hpp>
 
 #include <gmock/gmock.h>
 
@@ -10,10 +10,11 @@ namespace roen
 namespace interfaces
 {
 
-class SceneMock final : public IScene
+class SceneMock final : public Scene
 {
 public:
-    explicit SceneMock(manager::GameSceneManager& manager) : IScene(manager) {};
+    explicit SceneMock(manager::GameSceneManager& manager)
+        : Scene(manager) {};
 
     MOCK_METHOD(void, handleInput, (), (override));
     MOCK_METHOD(void, render, (), (override));
@@ -23,7 +24,7 @@ public:
     MOCK_METHOD(void, quit, (), (override));
 };
 
-} // interfaces
+}  // namespace interfaces
 
 namespace manager
 {
@@ -86,8 +87,7 @@ TEST_F(GameSceneManagerTests, pop_ShouldCorrectlyPopTopScene)
 TEST_F(GameSceneManagerTests, pop_ShouldCallRevealOnNewTopScene)
 {
     auto sceneOne = std::make_unique<interfaces::SceneMock>(manager_);
-    EXPECT_CALL(*sceneOne, revealed())
-        .Times(2); //Once on push, once after pop
+    EXPECT_CALL(*sceneOne, revealed()).Times(2);  // Once on push, once after pop
 
     manager_.push(std::move(sceneOne));
     manager_.push(std::make_unique<interfaces::SceneMock>(manager_));
@@ -116,6 +116,6 @@ TEST_F(GameSceneManagerTests, getCurrentScene_ShouldReturnTopScene)
     EXPECT_NE(&currentScene, sceneOnePtr);
 }
 
-} // manager
+}  // namespace manager
 
-} // roen
+}  // namespace roen

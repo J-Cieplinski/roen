@@ -1,5 +1,5 @@
-#ifndef ROEN_INTERFACES_ISCENE_HPP
-#define ROEN_INTERFACES_ISCENE_HPP
+#ifndef ROEN_INTERFACES_SCENE_HPP
+#define ROEN_INTERFACES_SCENE_HPP
 
 #include <data_structure/SystemsContainer.hpp>
 
@@ -11,16 +11,14 @@ class GameSceneManager;
 namespace roen::interfaces
 {
 
-class IScene
+class Scene
 {
 public:
-    explicit IScene(manager::GameSceneManager& gameSceneManager)
-        : gameSceneManager_{gameSceneManager}
-    {
-    }
+    explicit Scene(manager::GameSceneManager& gameSceneManager);
 
-    virtual ~IScene() = default;
+    virtual ~Scene() = default;
 
+    virtual void onInit();
     virtual void handleInput() = 0;
     virtual void render() = 0;
     virtual void update() = 0;
@@ -35,4 +33,4 @@ protected:
 
 }  // namespace roen::interfaces
 
-#endif  // ROEN_INTERFACES_ISCENE_HPP
+#endif  // ROEN_INTERFACES_SCENE_HPP

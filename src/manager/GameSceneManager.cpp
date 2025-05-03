@@ -1,6 +1,6 @@
 #include <manager/GameSceneManager.hpp>
 
-#include <interfaces/IScene.hpp>
+#include <interfaces/Scene.hpp>
 
 #include <stdexcept>
 
@@ -15,7 +15,7 @@ void GameSceneManager::shutdown()
     }
 }
 
-void GameSceneManager::push(std::unique_ptr<interfaces::IScene> scene)
+void GameSceneManager::push(std::unique_ptr<interfaces::Scene> scene)
 {
     if (!scenes_.empty())
     {
@@ -26,7 +26,7 @@ void GameSceneManager::push(std::unique_ptr<interfaces::IScene> scene)
     scenes_.push(std::move(scene));
 }
 
-void GameSceneManager::switchScene(std::unique_ptr<interfaces::IScene> scene)
+void GameSceneManager::switchScene(std::unique_ptr<interfaces::Scene> scene)
 {
     if (!scenes_.empty())
     {
@@ -52,14 +52,14 @@ void GameSceneManager::pop()
     }
 }
 
-interfaces::IScene& GameSceneManager::getCurrentScene()
+interfaces::Scene& GameSceneManager::getCurrentScene()
 {
     if (scenes_.empty())
     {
         throw std::out_of_range("There are no game scenes present in the manager");
     }
 
-    return static_cast<interfaces::IScene&>(*(scenes_.top()));
+    return static_cast<interfaces::Scene&>(*(scenes_.top()));
 }
 
 void GameSceneManager::update()

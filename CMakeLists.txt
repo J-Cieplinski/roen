@@ -13,6 +13,7 @@ set(DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
 set(SPDLOG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spdlog/include)
 set(ENTT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/entt/src)
 set(RAYLIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/raylib/src)
+set(LUA_INCLUDE_DIR ${DEPENDENCIES_DIR}/sol2)
 set(DEPENDENCIES_INCLUDE_DIR ${DEPENDENCIES_DIR} ${ENTT_DIR} ${RAYLIB_DIR} ${SPDLOG_DIR})
 
 
@@ -33,9 +34,6 @@ endif (UNIX)
 target_sources(${PROJECT_NAME}
     PUBLIC
     ${INCLUDE_DIR}/Utils.hpp
-    ${INCLUDE_DIR}/interfaces/IAsset.hpp
-    ${INCLUDE_DIR}/interfaces/IScene.hpp
-    ${INCLUDE_DIR}/interfaces/ISystem.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/EntryPoint.hpp
 )
 

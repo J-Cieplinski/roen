@@ -1,0 +1,12 @@
+target_sources(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/Entity.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/EntityManager.cpp
+    PUBLIC
+    ${INCLUDE_DIR}/ecs/Entity.hpp
+    ${INCLUDE_DIR}/ecs/EntityManager.hpp
+    ${INCLUDE_DIR}/ecs/components/DirtyComponent.hpp
+    ${INCLUDE_DIR}/ecs/components/FactionComponent.hpp
+    ${INCLUDE_DIR}/ecs/components/GraphicsComponent.hpp
+    ${INCLUDE_DIR}/ecs/components/TransformComponent.hpp
+)

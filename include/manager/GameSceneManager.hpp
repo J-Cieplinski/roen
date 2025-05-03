@@ -1,12 +1,19 @@
 #ifndef ROEN_MANAGER_GAMESCENEMANAGER_HPP
 #define ROEN_MANAGER_GAMESCENEMANAGER_HPP
 
-#include <interfaces/IScene.hpp>
-
 #include <memory>
 #include <stack>
+#include <vector>
 
-namespace roen::manager
+namespace roen
+{
+
+namespace interfaces
+{
+class Scene;
+}  // namespace interfaces
+
+namespace manager
 {
 
 class GameSceneManager
@@ -14,18 +21,20 @@ class GameSceneManager
 public:
     void shutdown();
 
-    void push(std::unique_ptr<interfaces::IScene> scene);
+    void push(std::unique_ptr<interfaces::Scene> scene);
     void pop();
-    void switchScene(std::unique_ptr<interfaces::IScene> scene);
+    void switchScene(std::unique_ptr<interfaces::Scene> scene);
     void update();
-    interfaces::IScene& getCurrentScene();
+    interfaces::Scene& getCurrentScene();
 
 private:
-    std::stack<std::unique_ptr<interfaces::IScene>> scenes_;
-    std::vector<std::unique_ptr<interfaces::IScene>> poppedScenes_;
-    std::vector<std::unique_ptr<interfaces::IScene>> delayedScenes_;
+    std::stack<std::unique_ptr<interfaces::Scene>> scenes_;
+    std::vector<std::unique_ptr<interfaces::Scene>> poppedScenes_;
+    std::vector<std::unique_ptr<interfaces::Scene>> delayedScenes_;
 };
 
-}  // namespace roen::manager
+}  // namespace manager
+
+}  // namespace roen
 
 #endif  // ROEN_MANAGER_GAMESCENEMANAGER_HPP

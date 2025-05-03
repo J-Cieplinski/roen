@@ -24,8 +24,8 @@
 #include <data_structure/PriorityQueue.hpp>
 #include <data_structure/SystemsContainer.hpp>
 #include <interfaces/IAsset.hpp>
-#include <interfaces/IScene.hpp>
 #include <interfaces/ISystem.hpp>
+#include <interfaces/Scene.hpp>
 #include <loader/BaseMapLoader.hpp>
 #include <log/Logger.hpp>
 #include <log/formatters/entity.hpp>
