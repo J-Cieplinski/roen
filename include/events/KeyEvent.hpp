@@ -12,14 +12,14 @@ namespace roen::events
 
 struct KeyEvent final : public Event
 {
-    KeyEvent(roen::KeyCodes::Key key)
+    KeyEvent(KeyCodes::Key key)
         : key{key}
     {
     }
 
     EVENT_CLASS_TYPE(KeyEvent)
 
-    roen::KeyCodes::Key key;
+    KeyCodes::Key key;
 };
 
 }  // namespace roen::events

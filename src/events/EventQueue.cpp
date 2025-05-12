@@ -10,7 +10,9 @@ void EventQueue::clear()
 
 std::vector<std::shared_ptr<Event>> EventQueue::getEvents()
 {
-    return events_;
+    std::vector<std::shared_ptr<Event>> eventsTmp;
+    std::swap(events_, eventsTmp);
+    return std::move(eventsTmp);
 }
 
 }  // namespace roen::events

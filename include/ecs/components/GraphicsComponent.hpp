@@ -15,20 +15,21 @@ struct GraphicsComponent
 {
     GraphicsComponent()
         : srcRectangle{0, 0, 0, 0}
-        , guid{0}
         , zLayer{0}
+        , guid{0}
     {
     }
 
     GraphicsComponent(const std::string& str, Rectangle srcRectangle)
         : GraphicsComponent{str, srcRectangle, 0}
     {
+        SDK_TRACE("Construced GraphicsComponent with str: {}", str);
     }
 
     GraphicsComponent(const std::string& str, Rectangle srcRectangle, std::uint8_t zLayer)
         : srcRectangle{srcRectangle}
-        , guid{roen::hashString(str)}
         , zLayer{zLayer}
+        , guid{hashString(str)}
     {
     }
 
@@ -42,7 +43,7 @@ struct GraphicsComponent
         return srcRectangle;
     }
 
-    bool operator==(const GraphicsComponent& other)
+    bool operator==(const GraphicsComponent& other) const
     {
         return srcRectangle.height == other.srcRectangle.height
                and srcRectangle.width == other.srcRectangle.width

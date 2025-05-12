@@ -71,8 +71,6 @@ void LuaManager::InitLua()
 {
     instance_->lua_.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math,
                                    sol::lib::table, sol::lib::os, sol::lib::string);
-
-    instance_->lua_.set("scene", instance_->scene_);
 }
 
 void LuaManager::InitLuaInput()
@@ -271,11 +269,11 @@ void LuaManager::InitRaylibTypes()
     auto rec = instance_->lua_.new_usertype<Rectangle>(
         "Rectangle", sol::constructors<Rectangle(float, float, float, float)>(),
         sol::meta_function::to_string,
-        [](const Rectangle& rec) -> std::string
+        [](const Rectangle& rectangle) -> std::string
         {
-            return "Rectangle {x: " + std::to_string(rec.x) + " y: " + std::to_string(rec.y)
-                   + " width: " + std::to_string(rec.width)
-                   + " height: " + std::to_string(rec.height) + "}";
+            return "Rectangle {x: " + std::to_string(rectangle.x) + " y: "
+                   + std::to_string(rectangle.y) + " width: " + std::to_string(rectangle.width)
+                   + " height: " + std::to_string(rectangle.height) + "}";
         });
 
     rec["x"] = &Rectangle::x;
@@ -327,10 +325,32 @@ void LuaManager::InitECS()
     REGISTER_COMPONENT_WITH_ECS(instance_->lua_, FactionComponent);
 }
 
+template <typename EventType, typename... Args>
+std::function<void(events::EventQueue&, Args...)> make_enqueue_lambda()
+{
+    return [](events::EventQueue& q, Args... args)
+    { q.enqueue<EventType>(std::forward<Args>(args)...); };
+}
+
+#define REGISTER_EVENT_TYPE(curLuaState, Ev, ...)                                           \
+    {                                                                                       \
+        auto event_type                                                                     \
+            = curLuaState["EventQueue"].get_or_create<sol::usertype<events::EventQueue>>(); \
+        event_type.set_function(CONCAT(enqueue, Ev),                                        \
+                                make_enqueue_lambda<events::Ev, __VA_ARGS__>());            \
+    }
+
 void LuaManager::InitScene()
 {
+    instance_->lua_.set("scene", instance_->scene_);
+
     auto scene = instance_->lua_.new_usertype<interfaces::Scene>("Scene");
     scene.set_function("getEntityManager", &interfaces::Scene::getEntityManager);
+    scene.set_function("getEventQueue", &interfaces::Scene::getEventQueue);
+
+    auto eventQueue = instance_->lua_.new_usertype<events::EventQueue>("EventQueue");
+    REGISTER_EVENT_TYPE(instance_->lua_, MouseEvent, Vector2, std::int32_t)
+    REGISTER_EVENT_TYPE(instance_->lua_, KeyEvent, KeyCodes::Key)
 }
 
 void LuaManager::InitUtils()

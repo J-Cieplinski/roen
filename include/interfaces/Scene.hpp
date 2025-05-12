@@ -3,6 +3,7 @@
 
 #include <data_structure/SystemsContainer.hpp>
 #include <ecs/EntityManager.hpp>
+#include <events/EventQueue.hpp>
 
 namespace roen::manager
 {
@@ -20,7 +21,8 @@ public:
     virtual ~Scene() = default;
 
     ecs::EntityManager& getEntityManager();
-    virtual void onInit();
+    events::EventQueue& getEventQueue();
+    virtual void onInit() = 0;
     virtual void handleInput() = 0;
     virtual void render() = 0;
     virtual void update() = 0;
@@ -32,6 +34,7 @@ protected:
     manager::GameSceneManager& gameSceneManager_;
     ecs::EntityManager entityManager_;
     data_structure::SystemsContainer systems_;
+    events::EventQueue queue_;
 };
 
 }  // namespace roen::interfaces

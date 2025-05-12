@@ -25,7 +25,7 @@ Application::~Application()
 
 void Application::run()
 {
-    APP_INFO("Started main loop");
+    SDK_INFO("Started main loop");
 
     while (isRunning_)
     {
@@ -40,7 +40,7 @@ void Application::run()
         }
         catch (std::exception& e)
         {
-            APP_CRITICAL(e.what());
+            SDK_CRITICAL(e.what());
             return;
         }
     }
