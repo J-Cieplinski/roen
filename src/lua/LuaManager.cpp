@@ -23,18 +23,19 @@
 
 namespace roen::lua
 {
-
 #define STR(str) #str
 #define CONCAT(left, right) STR(left##right)
 
-#define REGISTER_COMPONENT_WITH_ECS(curLuaState, Comp)                                            \
+#define REGISTER_COMPONENT_WITH_ECS(curLuaState, Comp, ...)                                       \
     {                                                                                             \
         namespace component = ecs::components;                                                    \
         auto entity_type = curLuaState["Entity"].get_or_create<sol::usertype<ecs::Entity>>();     \
         entity_type.set_function(CONCAT(remove, Comp),                                            \
                                  &ecs::Entity::removeComponent<component::Comp>);                 \
-        entity_type.set_function(CONCAT(get, Comp), &ecs::Entity::getComponent<component::Comp>); \
+        entity_type.set_function(CONCAT(get, Comp), [](ecs::Entity& self) -> component::Comp&     \
+                                 { return std::ref(self.getComponent<component::Comp>()); });     \
         entity_type.set_function(CONCAT(add, Comp), &ecs::Entity::addComponent<component::Comp>); \
+        entity_type.set_function(CONCAT(has, Comp), sol::overload(__VA_ARGS__));                  \
         entity_type.set_function(CONCAT(has, Comp), &ecs::Entity::hasComponent<component::Comp>); \
     }
 
@@ -49,7 +50,6 @@ LuaManager& LuaManager::Instance()
     {
         instance_ = std::unique_ptr<LuaManager>(new LuaManager());
     }
-
     return *instance_;
 }
 
@@ -298,8 +298,6 @@ void LuaManager::InitECS()
     auto entity = instance_->lua_.new_usertype<ecs::Entity>(
         "Entity", sol::constructors<sol::types<entt::entity, entt::registry&>>());
 
-    REGISTER_COMPONENT_WITH_ECS(instance_->lua_, FactionComponent);
-
     auto graphicsComponent = instance_->lua_.new_usertype<ecs::components::GraphicsComponent>(
         "GraphicsComponent",
         sol::constructors<sol::types<const std::string&, Rectangle>,
@@ -309,20 +307,30 @@ void LuaManager::InitECS()
     graphicsComponent["zLayer"] = &ecs::components::GraphicsComponent::zLayer;
     graphicsComponent["guid"] = &ecs::components::GraphicsComponent::guid;
 
-    REGISTER_COMPONENT_WITH_ECS(instance_->lua_, GraphicsComponent);
+    REGISTER_COMPONENT_WITH_ECS(
+        instance_->lua_, GraphicsComponent,
+        [](ecs::Entity& self, const std::string& str, const Rectangle& rect)
+        { return std::ref(self.addComponent<ecs::components::GraphicsComponent>(str, rect)); },
+        [](ecs::Entity& self, const std::string& str, const Rectangle& rect, std::uint8_t z)
+        { return std::ref(self.addComponent<ecs::components::GraphicsComponent>(str, rect, z)); });
 
     auto transformComponent = instance_->lua_.new_usertype<ecs::components::TransformComponent>(
         "TransformComponent", sol::constructors<sol::types<Vector2>>());
 
     transformComponent["transform"] = &ecs::components::TransformComponent::transform;
 
-    REGISTER_COMPONENT_WITH_ECS(instance_->lua_, TransformComponent);
+    REGISTER_COMPONENT_WITH_ECS(
+        instance_->lua_, TransformComponent, [](ecs::Entity& self, const Vector2& vec)
+        { return std::ref(self.addComponent<ecs::components::TransformComponent>(vec)); });
 
     auto factionComponent = instance_->lua_.new_usertype<ecs::components::FactionComponent>(
         "FactionComponent", sol::constructors<sol::types<std::bitset<8>>>());
 
     factionComponent["factionMask"] = &ecs::components::FactionComponent::factionMask;
-    REGISTER_COMPONENT_WITH_ECS(instance_->lua_, FactionComponent);
+
+    REGISTER_COMPONENT_WITH_ECS(
+        instance_->lua_, FactionComponent, [](ecs::Entity& self, const std::bitset<8>& mask)
+        { return std::ref(self.addComponent<ecs::components::FactionComponent>(mask)); });
 }
 
 template <typename EventType, typename... Args>
@@ -375,7 +383,7 @@ void LuaManager::InitEventTypes()
         "mouseButton", &events::MouseEvent::mouseButton);
 
     instance_->lua_.new_usertype<events::KeyEvent>("KeyEvent",
-        sol::constructors<events::KeyEvent(roen::KeyCodes::Key)>(),
+        sol::constructors<events::KeyEvent(KeyCodes::Key)>(),
         sol::base_classes, sol::bases<events::Event>(),
         "key", &events::KeyEvent::key);
 

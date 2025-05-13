@@ -62,10 +62,9 @@ namespace roen::ecs
 template <typename Component, typename... Args>
 Component& Entity::addComponent(Args... args)
 {
-    Component comp(std::forward<Args>(args)...);
     SDK_INFO("Adding component: {} to entity: {}",
              getDemangledName(std::type_index(typeid(Component)).name()), entity_);
-    return registry_.emplace<Component>(entity_, comp);
+    return registry_.emplace<Component>(entity_, std::forward<Args>(args)...);
 }
 
 template <typename Component>
@@ -96,10 +95,8 @@ std::expected<std::reference_wrapper<Component>, Error> Entity::getComponentMayb
     {
         return *component;
     }
-    else
-    {
-        return std::unexpected{Error::COMPONENT_MISSING};
-    }
+
+    return std::unexpected{Error::COMPONENT_MISSING};
 }
 
 }  // namespace roen::ecs
