@@ -15,11 +15,17 @@ Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(windowWith, windowHeight, windowTitle.c_str());
+    InitAudioDevice();
+    textureManager_ = std::make_shared<TextureManager>();
+    soundManager_ = std::make_shared<SoundManager>();
+    musicManager_ = std::make_shared<MusicManager>();
+    fontManager_ = std::make_shared<FontManager>();
 }
 
 Application::~Application()
 {
     gameSceneManager_.shutdown();
+    CloseAudioDevice();
     CloseWindow();
 }
 
@@ -44,6 +50,30 @@ void Application::run()
             return;
         }
     }
+}
+
+template <>
+std::shared_ptr<MusicManager> Application::getAssetManager() const
+{
+    return musicManager_;
+}
+
+template <>
+std::shared_ptr<TextureManager> Application::getAssetManager() const
+{
+    return textureManager_;
+}
+
+template <>
+std::shared_ptr<SoundManager> Application::getAssetManager() const
+{
+    return soundManager_;
+}
+
+template <>
+std::shared_ptr<FontManager> Application::getAssetManager() const
+{
+    return fontManager_;
 }
 
 }  // namespace roen

@@ -1,19 +1,22 @@
-#ifndef SPIELDA_ASSETMANAGER_HPP
-#define SPIELDA_ASSETMANAGER_HPP
+#ifndef ROEN_ASSETMANAGER_HPP
+#define ROEN_ASSETMANAGER_HPP
 
 #include <interfaces/IAsset.hpp>
 #include <log/Logger.hpp>
 
 #include <filesystem>
+#include <optional>
 #include <stdexcept>
 #include <typeindex>
 #include <unordered_map>
 
-namespace roen::manager
+namespace roen
 {
 
 template <typename AssetType>
-concept DerivedFromIAsset = std::is_base_of_v<interfaces::IAsset, AssetType>;
+concept DerivedFromIAsset = std::is_base_of_v<interfaces::IAsset, AssetType> and requires {
+    { AssetType::LoadFallbackAsset() } -> std::same_as<AssetType>;
+};
 
 class IAssetManager
 {
@@ -27,17 +30,18 @@ template <DerivedFromIAsset AssetType>
 class AssetManager : public IAssetManager
 {
 public:
+    AssetManager();
     ~AssetManager() override;
 
     void loadAsset(const std::string& id, const std::filesystem::path& path) override;
     void freeAssets() override;
-    AssetType& getAsset(std::uint64_t id) const;
+    const AssetType& getAsset(std::string_view id) const;
 
 private:
-    inline static std::unordered_map<std::uint64_t, AssetType> assets_;
+    std::unordered_map<std::uint64_t, AssetType> assets_;
 };
 
-}  // namespace roen::manager
+}  // namespace roen
 
 /*
  * Template definition
@@ -45,13 +49,22 @@ private:
 
 #include <Utils.hpp>
 
-namespace roen::manager
+namespace roen
 {
+
+template <DerivedFromIAsset AssetType>
+AssetManager<AssetType>::AssetManager()
+{
+    auto hashedString = hashString(interfaces::DefaultAssetName);
+    auto asset = AssetType::LoadFallbackAsset();
+
+    assets_[hashedString] = asset;
+}
 
 template <DerivedFromIAsset AssetType>
 AssetManager<AssetType>::~AssetManager()
 {
-    AssetManager<AssetType>::freeAssets();
+    AssetManager::freeAssets();
 }
 
 template <DerivedFromIAsset AssetType>
@@ -80,26 +93,35 @@ void AssetManager<AssetType>::loadAsset(const std::string& id, const std::filesy
         std::stringstream ss;
         ss << "Failed to open asset with path: " << path << " and id: " << id;
         SDK_CRITICAL(ss.str());
-        throw std::runtime_error(ss.str());
+        return;
     }
 
     assets_[hashedString] = asset;
 }
 
 template <DerivedFromIAsset AssetType>
-AssetType& AssetManager<AssetType>::getAsset(std::uint64_t id) const
+const AssetType& AssetManager<AssetType>::getAsset(std::string_view id) const
 {
+    const auto hashedID = hashString(id);
     try
     {
-        return assets_.at(id);
+        return assets_.at(hashedID);
     }
-    catch (std::out_of_range& e)
+    catch (std::out_of_range&)
     {
-        SDK_CRITICAL("{0} id: {1} does not exist", std::type_index(typeid(AssetType)).name(), id);
-        throw e;
+        SDK_WARN("{0} id: \"{1}\" does not exist",
+                 getDemangledName(std::type_index(typeid(AssetType)).name()), id);
+        return assets_.at(interfaces::DefaultAssetID);
     }
 }
 
-}  // namespace roen::manager
+}  // namespace roen
 
-#endif  // SPIELDA_ASSETMANAGER_HPP
+#include <core/Assets.hpp>
+
+using TextureManager = roen::AssetManager<roen::TextureAsset>;
+using FontManager = roen::AssetManager<roen::FontAsset>;
+using SoundManager = roen::AssetManager<roen::SoundAsset>;
+using MusicManager = roen::AssetManager<roen::MusicAsset>;
+
+#endif  // ROEN_ASSETMANAGER_HPP

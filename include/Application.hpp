@@ -1,9 +1,11 @@
 #ifndef ROEN_APPLICATION_HPP
 #define ROEN_APPLICATION_HPP
 
+#include <core/AssetManager.hpp>
 #include <manager/GameSceneManager.hpp>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 
 namespace roen
@@ -16,11 +18,18 @@ public:
                 const std::string& windowTitle = "Roen");
     virtual ~Application();
 
+    template <typename AssetManager>
+    std::shared_ptr<AssetManager> getAssetManager() const;
+
     virtual void init() = 0;
 
     void run();
 
 protected:
+    std::shared_ptr<TextureManager> textureManager_;
+    std::shared_ptr<SoundManager> soundManager_;
+    std::shared_ptr<FontManager> fontManager_;
+    std::shared_ptr<MusicManager> musicManager_;
     manager::GameSceneManager gameSceneManager_;
     bool isRunning_;
 };

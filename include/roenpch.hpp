@@ -18,6 +18,7 @@
 #include <Utils.hpp>
 
 #include <algorithms/search/Pathfinding.hpp>
+#include <core/AssetManager.hpp>
 #include <data_structure/Graph.hpp>
 #include <data_structure/INode.hpp>
 #include <data_structure/MapNode.hpp>
@@ -29,7 +30,6 @@
 #include <loader/BaseMapLoader.hpp>
 #include <log/Logger.hpp>
 #include <log/formatters/entity.hpp>
-#include <manager/AssetManager.hpp>
 #include <manager/GameSceneManager.hpp>
 
 #endif  // ROEN_ROENPCH_HPP

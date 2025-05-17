@@ -1,9 +1,9 @@
 #ifndef SPIELDA_BASEMAPLOADER_HPP
 #define SPIELDA_BASEMAPLOADER_HPP
 
+#include <core/AssetManager.hpp>
 #include <data_structure/Graph.hpp>
 #include <data_structure/MapNode.hpp>
-#include <manager/AssetManager.hpp>
 
 #include <entt/entity/registry.hpp>
 
@@ -57,7 +57,7 @@ protected:
                                tson::Rect drawingRect, int layerOrder,
                                const std::string& layerClass, const std::string& assetId)
         = 0;
-    virtual manager::IAssetManager& getTextureManager() = 0;
+    virtual IAssetManager& getTextureManager() = 0;
 
     Vector2 mapSize_;
     Vector2 tileSize_;

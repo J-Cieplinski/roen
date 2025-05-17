@@ -1,10 +1,15 @@
 #ifndef ROEN_INTERFACES_IASSET_HPP
 #define ROEN_INTERFACES_IASSET_HPP
 
+#include <Utils.hpp>
+
 #include <filesystem>
 
 namespace roen::interfaces
 {
+
+constexpr std::string DefaultAssetName{"DefaultAsset"};
+constexpr std::uint64_t DefaultAssetID{hashString(DefaultAssetName)};
 
 class IAsset
 {
@@ -20,11 +25,23 @@ class Asset : public IAsset
 {
 public:
     virtual ~Asset() = default;
-    virtual AssetType get() const = 0;
+    [[nodiscard]]
+    virtual AssetType get() const
+    {
+        return asset_;
+    }
     operator AssetType() const
     {
         return get();
-    };
+    }
+    std::string_view getPath() const
+    {
+        return assetPath_;
+    }
+
+protected:
+    AssetType asset_;
+    std::string assetPath_;
 };
 
 }  // namespace roen::interfaces

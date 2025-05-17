@@ -10,31 +10,26 @@
 namespace roen
 {
 
-constexpr std::int32_t pow(std::int32_t base, std::uint32_t exponent)
+constexpr std::uint64_t intPow(std::uint64_t base, std::uint32_t exp)
 {
-    if (exponent == 0)
+    std::uint64_t result = 1;
+    for (std::uint32_t i = 0; i < exp; ++i)
     {
-        return 1;
+        result *= base;
     }
-    if (exponent % 2 == 0)
-    {
-        std::uint32_t curr = pow(base, exponent / 2);
-        return curr * curr;
-    }
-
-    return base * pow(base, exponent - 1);
+    return result;
 }
 
 /*
  * Hashes string used for loaded asset identification
  */
-constexpr std::uint64_t hashString(const std::string& str)
+constexpr std::uint64_t hashString(const std::string_view str)
 {
     constexpr std::uint32_t PRIME_CONST{31};
     std::uint64_t hashCode{0};
     for (std::uint32_t i = 0; const auto& ch : str)
     {
-        hashCode += ch * pow(PRIME_CONST, i);
+        hashCode += ch * pow(PRIME_CONST, i++);
     }
 
     return hashCode;
@@ -82,8 +77,15 @@ inline std::string getDemangledName(const std::string& name)
     return result;
 }
 
+#else
+
+inline std::string getDemangledName(const std::string& name)
+{
+    return name;
+}
+
 #endif
 
-}  // roen
+}  // namespace roen
 
 #endif  // ROEN_UTILS_HPP

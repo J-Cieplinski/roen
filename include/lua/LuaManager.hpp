@@ -42,6 +42,8 @@ private:
     LuaManager() = default;
 
     static void InitLua();
+    static void InitLuaApplication();
+    static void InitLuaAssets();
     static void InitLuaInput();
     static void InitLuaLog();
     static void InitEventTypes();

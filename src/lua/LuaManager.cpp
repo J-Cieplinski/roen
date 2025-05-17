@@ -2,13 +2,15 @@
 
 #include <lua/scripts/LuaEventHandler.hpp>
 
+#include <Application.hpp>
+
+#include <core/AssetManager.hpp>
 #include <core/Input.hpp>
 #include <core/KeyCodes.hpp>
 
 #include <ecs/Entity.hpp>
 #include <ecs/EntityManager.hpp>
 
-#include <ecs/components/DirtyComponent.hpp>
 #include <ecs/components/FactionComponent.hpp>
 #include <ecs/components/GraphicsComponent.hpp>
 #include <ecs/components/TransformComponent.hpp>
@@ -49,6 +51,9 @@ LuaManager& LuaManager::Instance()
     if (not instance_)
     {
         instance_ = std::unique_ptr<LuaManager>(new LuaManager());
+
+        lua_gc(instance_->lua_, LUA_GCSETPAUSE, 0);  // collect as often as possible
+        lua_gc(instance_->lua_, LUA_GCSETSTEPMUL, 1);
     }
     return *instance_;
 }
@@ -57,7 +62,9 @@ void LuaManager::onInit(interfaces::Scene* scene)
 {
     scene_ = scene;
     InitLua();
+    InitLuaApplication();
     InitLuaInput();
+    InitLuaAssets();
     InitLuaLog();
     InitEventTypes();
     InitECS();
@@ -73,180 +80,203 @@ void LuaManager::InitLua()
                                    sol::lib::table, sol::lib::os, sol::lib::string);
 }
 
+void LuaManager::InitLuaApplication()
+{
+    auto application = instance_->lua_.new_usertype<Application>("Application");
+}
+
+#define SET_ASSET_MANAGER_FUNC(name)                                                             \
+    {                                                                                            \
+        auto applicationType                                                                     \
+            = instance_->lua_["Application"].get_or_create<sol::usertype<Application>>();        \
+        applicationType.set_function(                                                            \
+            CONCAT(get, name), [](Application* self) { return self->getAssetManager<name>(); }); \
+        auto name##Usertype = instance_->lua_.new_usertype<name>(#name, sol::no_constructor);    \
+        name##Usertype.set_function("loadAsset",                                                 \
+                                    [](std::shared_ptr<name> self, const std::string& id,        \
+                                       const std::string& path) { self->loadAsset(id, path); }); \
+        name##Usertype.set_function("getAsset", [](name& self, const std::string& id)            \
+                                    { return std::ref(self.getAsset(id)); });                    \
+    }
+
+void LuaManager::InitLuaAssets()
+{
+    SET_ASSET_MANAGER_FUNC(SoundManager)
+    SET_ASSET_MANAGER_FUNC(TextureManager)
+    SET_ASSET_MANAGER_FUNC(FontManager)
+    SET_ASSET_MANAGER_FUNC(MusicManager)
+}
+
 void LuaManager::InitLuaInput()
 {
     auto input = instance_->lua_["Input"].get_or_create<sol::table>();
 
-    input.set_function(
-        "KeyPressed", [](roen::KeyCodes::Key key) -> bool { return roen::Input::KeyPressed(key); });
+    input.set_function("KeyPressed",
+                       [](KeyCodes::Key key) -> bool { return Input::KeyPressed(key); });
 
-    input.set_function("KeyReleased", [](roen::KeyCodes::Key key) -> bool
-                       { return roen::Input::KeyReleased(key); });
+    input.set_function("KeyReleased",
+                       [](KeyCodes::Key key) -> bool { return Input::KeyReleased(key); });
 
-    input.set_function("KeyDown",
-                       [](roen::KeyCodes::Key key) -> bool { return roen::Input::KeyDown(key); });
+    input.set_function("KeyDown", [](KeyCodes::Key key) -> bool { return Input::KeyDown(key); });
 
-    input.set_function("GetKey", []() -> roen::KeyCodes::Key { return roen::Input::GetKey(); });
+    input.set_function("GetKey", []() -> KeyCodes::Key { return Input::GetKey(); });
 
-    input.set_function("MouseButtonPressed", [](roen::KeyCodes::MouseButton button) -> bool
-                       { return roen::Input::MouseButtonPressed(button); });
+    input.set_function("MouseButtonPressed", [](KeyCodes::MouseButton button) -> bool
+                       { return Input::MouseButtonPressed(button); });
 
-    input.set_function("MouseButtonReleased", [](roen::KeyCodes::MouseButton button) -> bool
-                       { return roen::Input::MouseButtonReleased(button); });
+    input.set_function("MouseButtonReleased", [](KeyCodes::MouseButton button) -> bool
+                       { return Input::MouseButtonReleased(button); });
 
-    input.set_function("MouseButtonDown", [](roen::KeyCodes::MouseButton button) -> bool
-                       { return roen::Input::MouseButtonDown(button); });
+    input.set_function("MouseButtonDown", [](KeyCodes::MouseButton button) -> bool
+                       { return Input::MouseButtonDown(button); });
 
-    input.set_function("MousePosition", []() -> Vector2 { return roen::Input::MousePosition(); });
+    input.set_function("MousePosition", []() -> Vector2 { return Input::MousePosition(); });
 
-    std::initializer_list<std::pair<sol::string_view, roen::KeyCodes::Key>> keyItems
-        = {{"NONE", roen::KeyCodes::Key::NONE},
-           {"APOSTROPHE", roen::KeyCodes::Key::APOSTROPHE},
-           {"COMMA", roen::KeyCodes::Key::COMMA},
-           {"MINUS", roen::KeyCodes::Key::MINUS},
-           {"PERIOD", roen::KeyCodes::Key::PERIOD},
-           {"SLASH", roen::KeyCodes::Key::SLASH},
-           {"ZERO", roen::KeyCodes::Key::ZERO},
-           {"ONE", roen::KeyCodes::Key::ONE},
-           {"TWO", roen::KeyCodes::Key::TWO},
-           {"THREE", roen::KeyCodes::Key::THREE},
-           {"FIVE", roen::KeyCodes::Key::FIVE},
-           {"SIX", roen::KeyCodes::Key::SIX},
-           {"SEVEN", roen::KeyCodes::Key::SEVEN},
-           {"EIGHT", roen::KeyCodes::Key::EIGHT},
-           {"NINE", roen::KeyCodes::Key::NINE},
-           {"SEMICOLON", roen::KeyCodes::Key::SEMICOLON},
-           {"EQUAL", roen::KeyCodes::Key::EQUAL},
-           {"A", roen::KeyCodes::Key::A},
-           {"B", roen::KeyCodes::Key::B},
-           {"C", roen::KeyCodes::Key::C},
-           {"D", roen::KeyCodes::Key::D},
-           {"E", roen::KeyCodes::Key::E},
-           {"F", roen::KeyCodes::Key::F},
-           {"G", roen::KeyCodes::Key::G},
-           {"H", roen::KeyCodes::Key::H},
-           {"I", roen::KeyCodes::Key::I},
-           {"J", roen::KeyCodes::Key::J},
-           {"K", roen::KeyCodes::Key::K},
-           {"L", roen::KeyCodes::Key::L},
-           {"M", roen::KeyCodes::Key::M},
-           {"N", roen::KeyCodes::Key::N},
-           {"O", roen::KeyCodes::Key::O},
-           {"P", roen::KeyCodes::Key::P},
-           {"R", roen::KeyCodes::Key::R},
-           {"S", roen::KeyCodes::Key::S},
-           {"T", roen::KeyCodes::Key::T},
-           {"U", roen::KeyCodes::Key::U},
-           {"V", roen::KeyCodes::Key::V},
-           {"W", roen::KeyCodes::Key::W},
-           {"X", roen::KeyCodes::Key::X},
-           {"Y", roen::KeyCodes::Key::Y},
-           {"Z", roen::KeyCodes::Key::Z},
-           {"LEFT_BRACKET", roen::KeyCodes::Key::LEFT_BRACKET},
-           {"BACKSLASH", roen::KeyCodes::Key::BACKSLASH},
-           {"RIGHT_BRACKET", roen::KeyCodes::Key::RIGHT_BRACKET},
-           {"GRAVE", roen::KeyCodes::Key::GRAVE},
-           {"SPACE", roen::KeyCodes::Key::SPACE},
-           {"ESCAPE", roen::KeyCodes::Key::ESCAPE},
-           {"ENTER", roen::KeyCodes::Key::ENTER},
-           {"TAB", roen::KeyCodes::Key::TAB},
-           {"BACKSPACE", roen::KeyCodes::Key::BACKSPACE},
-           {"INSERT", roen::KeyCodes::Key::INSERT},
-           {"DELETE", roen::KeyCodes::Key::DELETE},
-           {"RIGHT", roen::KeyCodes::Key::RIGHT},
-           {"LEFT", roen::KeyCodes::Key::LEFT},
-           {"DOWN", roen::KeyCodes::Key::DOWN},
-           {"UP", roen::KeyCodes::Key::UP},
-           {"PAGE_UP", roen::KeyCodes::Key::PAGE_UP},
-           {"PAGE_DOWN", roen::KeyCodes::Key::PAGE_DOWN},
-           {"HOME", roen::KeyCodes::Key::HOME},
-           {"END", roen::KeyCodes::Key::END},
-           {"CAPS_LOCK", roen::KeyCodes::Key::CAPS_LOCK},
-           {"SCROLL_LOCK", roen::KeyCodes::Key::SCROLL_LOCK},
-           {"NUM_LOCK", roen::KeyCodes::Key::NUM_LOCK},
-           {"PRINT_SCREEN", roen::KeyCodes::Key::PRINT_SCREEN},
-           {"PAUSE", roen::KeyCodes::Key::PAUSE},
-           {"F1", roen::KeyCodes::Key::F1},
-           {"F2", roen::KeyCodes::Key::F2},
-           {"F3", roen::KeyCodes::Key::F3},
-           {"F4", roen::KeyCodes::Key::F4},
-           {"F5", roen::KeyCodes::Key::F5},
-           {"F6", roen::KeyCodes::Key::F6},
-           {"F7", roen::KeyCodes::Key::F7},
-           {"F8", roen::KeyCodes::Key::F8},
-           {"F9", roen::KeyCodes::Key::F9},
-           {"F10", roen::KeyCodes::Key::F10},
-           {"F11", roen::KeyCodes::Key::F11},
-           {"F12", roen::KeyCodes::Key::F12},
-           {"LEFT_SHIFT", roen::KeyCodes::Key::LEFT_SHIFT},
-           {"LEFT_CONTROL", roen::KeyCodes::Key::LEFT_CONTROL},
-           {"LEFT_ALT", roen::KeyCodes::Key::LEFT_ALT},
-           {"LEFT_SUPER", roen::KeyCodes::Key::LEFT_SUPER},
-           {"RIGHT_SHIFT", roen::KeyCodes::Key::RIGHT_SHIFT},
-           {"RIGHT_CONTROL", roen::KeyCodes::Key::RIGHT_CONTROL},
-           {"RIGHT_ALT", roen::KeyCodes::Key::RIGHT_ALT},
-           {"RIGHT_SUPER", roen::KeyCodes::Key::RIGHT_SUPER},
-           {"KB_MENU", roen::KeyCodes::Key::KB_MENU},
-           {"KP_0", roen::KeyCodes::Key::KP_0},
-           {"KP_1", roen::KeyCodes::Key::KP_1},
-           {"KP_2", roen::KeyCodes::Key::KP_2},
-           {"KP_3", roen::KeyCodes::Key::KP_3},
-           {"KP_4", roen::KeyCodes::Key::KP_4},
-           {"KP_5", roen::KeyCodes::Key::KP_5},
-           {"KP_6", roen::KeyCodes::Key::KP_6},
-           {"KP_7", roen::KeyCodes::Key::KP_7},
-           {"KP_8", roen::KeyCodes::Key::KP_8},
-           {"KP_9", roen::KeyCodes::Key::KP_9},
-           {"KP_DECIMAL", roen::KeyCodes::Key::KP_DECIMAL},
-           {"KP_DIVIDE", roen::KeyCodes::Key::KP_DIVIDE},
-           {"KP_MULTIPLY", roen::KeyCodes::Key::KP_MULTIPLY},
-           {"KP_SUBTRACT", roen::KeyCodes::Key::KP_SUBTRACT},
-           {"KP_ADD", roen::KeyCodes::Key::KP_ADD},
-           {"KP_ENTER", roen::KeyCodes::Key::KP_ENTER},
-           {"KP_EQUAL", roen::KeyCodes::Key::KP_EQUAL},
-           {"BACK", roen::KeyCodes::Key::BACK},
-           {"MENU", roen::KeyCodes::Key::MENU},
-           {"VOLUME_UP", roen::KeyCodes::Key::VOLUME_UP},
-           {"VOLUME_DOWN", roen::KeyCodes::Key::VOLUME_DOWN}};
+    std::initializer_list<std::pair<sol::string_view, KeyCodes::Key>> keyItems
+        = {{"NONE", KeyCodes::Key::NONE},
+           {"APOSTROPHE", KeyCodes::Key::APOSTROPHE},
+           {"COMMA", KeyCodes::Key::COMMA},
+           {"MINUS", KeyCodes::Key::MINUS},
+           {"PERIOD", KeyCodes::Key::PERIOD},
+           {"SLASH", KeyCodes::Key::SLASH},
+           {"ZERO", KeyCodes::Key::ZERO},
+           {"ONE", KeyCodes::Key::ONE},
+           {"TWO", KeyCodes::Key::TWO},
+           {"THREE", KeyCodes::Key::THREE},
+           {"FIVE", KeyCodes::Key::FIVE},
+           {"SIX", KeyCodes::Key::SIX},
+           {"SEVEN", KeyCodes::Key::SEVEN},
+           {"EIGHT", KeyCodes::Key::EIGHT},
+           {"NINE", KeyCodes::Key::NINE},
+           {"SEMICOLON", KeyCodes::Key::SEMICOLON},
+           {"EQUAL", KeyCodes::Key::EQUAL},
+           {"A", KeyCodes::Key::A},
+           {"B", KeyCodes::Key::B},
+           {"C", KeyCodes::Key::C},
+           {"D", KeyCodes::Key::D},
+           {"E", KeyCodes::Key::E},
+           {"F", KeyCodes::Key::F},
+           {"G", KeyCodes::Key::G},
+           {"H", KeyCodes::Key::H},
+           {"I", KeyCodes::Key::I},
+           {"J", KeyCodes::Key::J},
+           {"K", KeyCodes::Key::K},
+           {"L", KeyCodes::Key::L},
+           {"M", KeyCodes::Key::M},
+           {"N", KeyCodes::Key::N},
+           {"O", KeyCodes::Key::O},
+           {"P", KeyCodes::Key::P},
+           {"R", KeyCodes::Key::R},
+           {"S", KeyCodes::Key::S},
+           {"T", KeyCodes::Key::T},
+           {"U", KeyCodes::Key::U},
+           {"V", KeyCodes::Key::V},
+           {"W", KeyCodes::Key::W},
+           {"X", KeyCodes::Key::X},
+           {"Y", KeyCodes::Key::Y},
+           {"Z", KeyCodes::Key::Z},
+           {"LEFT_BRACKET", KeyCodes::Key::LEFT_BRACKET},
+           {"BACKSLASH", KeyCodes::Key::BACKSLASH},
+           {"RIGHT_BRACKET", KeyCodes::Key::RIGHT_BRACKET},
+           {"GRAVE", KeyCodes::Key::GRAVE},
+           {"SPACE", KeyCodes::Key::SPACE},
+           {"ESCAPE", KeyCodes::Key::ESCAPE},
+           {"ENTER", KeyCodes::Key::ENTER},
+           {"TAB", KeyCodes::Key::TAB},
+           {"BACKSPACE", KeyCodes::Key::BACKSPACE},
+           {"INSERT", KeyCodes::Key::INSERT},
+           {"DELETE", KeyCodes::Key::DELETE},
+           {"RIGHT", KeyCodes::Key::RIGHT},
+           {"LEFT", KeyCodes::Key::LEFT},
+           {"DOWN", KeyCodes::Key::DOWN},
+           {"UP", KeyCodes::Key::UP},
+           {"PAGE_UP", KeyCodes::Key::PAGE_UP},
+           {"PAGE_DOWN", KeyCodes::Key::PAGE_DOWN},
+           {"HOME", KeyCodes::Key::HOME},
+           {"END", KeyCodes::Key::END},
+           {"CAPS_LOCK", KeyCodes::Key::CAPS_LOCK},
+           {"SCROLL_LOCK", KeyCodes::Key::SCROLL_LOCK},
+           {"NUM_LOCK", KeyCodes::Key::NUM_LOCK},
+           {"PRINT_SCREEN", KeyCodes::Key::PRINT_SCREEN},
+           {"PAUSE", KeyCodes::Key::PAUSE},
+           {"F1", KeyCodes::Key::F1},
+           {"F2", KeyCodes::Key::F2},
+           {"F3", KeyCodes::Key::F3},
+           {"F4", KeyCodes::Key::F4},
+           {"F5", KeyCodes::Key::F5},
+           {"F6", KeyCodes::Key::F6},
+           {"F7", KeyCodes::Key::F7},
+           {"F8", KeyCodes::Key::F8},
+           {"F9", KeyCodes::Key::F9},
+           {"F10", KeyCodes::Key::F10},
+           {"F11", KeyCodes::Key::F11},
+           {"F12", KeyCodes::Key::F12},
+           {"LEFT_SHIFT", KeyCodes::Key::LEFT_SHIFT},
+           {"LEFT_CONTROL", KeyCodes::Key::LEFT_CONTROL},
+           {"LEFT_ALT", KeyCodes::Key::LEFT_ALT},
+           {"LEFT_SUPER", KeyCodes::Key::LEFT_SUPER},
+           {"RIGHT_SHIFT", KeyCodes::Key::RIGHT_SHIFT},
+           {"RIGHT_CONTROL", KeyCodes::Key::RIGHT_CONTROL},
+           {"RIGHT_ALT", KeyCodes::Key::RIGHT_ALT},
+           {"RIGHT_SUPER", KeyCodes::Key::RIGHT_SUPER},
+           {"KB_MENU", KeyCodes::Key::KB_MENU},
+           {"KP_0", KeyCodes::Key::KP_0},
+           {"KP_1", KeyCodes::Key::KP_1},
+           {"KP_2", KeyCodes::Key::KP_2},
+           {"KP_3", KeyCodes::Key::KP_3},
+           {"KP_4", KeyCodes::Key::KP_4},
+           {"KP_5", KeyCodes::Key::KP_5},
+           {"KP_6", KeyCodes::Key::KP_6},
+           {"KP_7", KeyCodes::Key::KP_7},
+           {"KP_8", KeyCodes::Key::KP_8},
+           {"KP_9", KeyCodes::Key::KP_9},
+           {"KP_DECIMAL", KeyCodes::Key::KP_DECIMAL},
+           {"KP_DIVIDE", KeyCodes::Key::KP_DIVIDE},
+           {"KP_MULTIPLY", KeyCodes::Key::KP_MULTIPLY},
+           {"KP_SUBTRACT", KeyCodes::Key::KP_SUBTRACT},
+           {"KP_ADD", KeyCodes::Key::KP_ADD},
+           {"KP_ENTER", KeyCodes::Key::KP_ENTER},
+           {"KP_EQUAL", KeyCodes::Key::KP_EQUAL},
+           {"BACK", KeyCodes::Key::BACK},
+           {"MENU", KeyCodes::Key::MENU},
+           {"VOLUME_UP", KeyCodes::Key::VOLUME_UP},
+           {"VOLUME_DOWN", KeyCodes::Key::VOLUME_DOWN}};
 
-    instance_->lua_.new_enum<roen::KeyCodes::Key, false>("Key", keyItems);
+    instance_->lua_.new_enum<KeyCodes::Key, false>("Key", keyItems);
 
-    std::initializer_list<std::pair<sol::string_view, roen::KeyCodes::MouseButton>> mouseItems = {
-        {"LEFT", roen::KeyCodes::MouseButton::LEFT},
-        {"RIGHT", roen::KeyCodes::MouseButton::RIGHT},
-        {"MIDDLE", roen::KeyCodes::MouseButton::MIDDLE},
-        {"FORWARD", roen::KeyCodes::MouseButton::FORWARD},
-        {"BACK", roen::KeyCodes::MouseButton::BACK},
-        {"EXTRA", roen::KeyCodes::MouseButton::EXTRA},
-        {"SIDE", roen::KeyCodes::MouseButton::SIDE},
+    std::initializer_list<std::pair<sol::string_view, KeyCodes::MouseButton>> mouseItems = {
+        {"LEFT", KeyCodes::MouseButton::LEFT},     {"RIGHT", KeyCodes::MouseButton::RIGHT},
+        {"MIDDLE", KeyCodes::MouseButton::MIDDLE}, {"FORWARD", KeyCodes::MouseButton::FORWARD},
+        {"BACK", KeyCodes::MouseButton::BACK},     {"EXTRA", KeyCodes::MouseButton::EXTRA},
+        {"SIDE", KeyCodes::MouseButton::SIDE},
     };
 
-    instance_->lua_.new_enum<roen::KeyCodes::MouseButton, false>("MouseButton", mouseItems);
+    instance_->lua_.new_enum<KeyCodes::MouseButton, false>("MouseButton", mouseItems);
 }
 
 #ifdef IS_DEBUG
-#    define SET_LOGGER_FUNC(level, name)                                      \
-        input.set_function(#name,                                             \
-                           [&state](sol::variadic_args va) -> void            \
-                           {                                                  \
-                               std::string result;                            \
-                               sol::function luaToString = state["tostring"]; \
-                               for (auto&& arg : va)                          \
-                               {                                              \
-                                   sol::object str = luaToString(arg);        \
-                                   result += str.as<std::string>() + " ";     \
-                               }                                              \
-                                                                              \
-                               level(result);                                 \
-                           });
+#    define SET_LOGGER_FUNC(level, name)                                       \
+        logger.set_function(#name,                                             \
+                            [&state](sol::variadic_args va) -> void            \
+                            {                                                  \
+                                std::string result;                            \
+                                sol::function luaToString = state["tostring"]; \
+                                for (auto&& arg : va)                          \
+                                {                                              \
+                                    sol::object str = luaToString(arg);        \
+                                    result += str.as<std::string>() + " ";     \
+                                }                                              \
+                                                                               \
+                                level(result);                                 \
+                            });
 #else
 #    define SET_LOGGER_FUNC(level, name) \
-        input.set_function(#name, [](sol::variadic_args va) { level(va); });
+        logger.set_function(#name, [](sol::variadic_args va) { level(va); });
 #endif  // IS_DEBUG
 
 void LuaManager::InitLuaLog()
 {
-    auto input = instance_->lua_["Logger"].get_or_create<sol::table>();
+    auto logger = instance_->lua_["Logger"].get_or_create<sol::table>();
     auto& state = instance_->lua_;
 
     SET_LOGGER_FUNC(LUA_ERROR, Error)
@@ -261,7 +291,7 @@ void LuaManager::InitRaylibTypes()
     auto vec2 = instance_->lua_.new_usertype<Vector2>(
         "Vector2", sol::constructors<Vector2(float, float)>(), sol::meta_function::to_string,
         [](const Vector2& vec) -> std::string
-        { return "Vector2 {x: " + std::to_string(vec.x) + " y: " + std::to_string(vec.y) + "}"; });
+        { return "{x: " + std::to_string(vec.x) + " y: " + std::to_string(vec.y) + "}"; });
 
     vec2["x"] = &Vector2::x;
     vec2["y"] = &Vector2::y;
@@ -271,8 +301,8 @@ void LuaManager::InitRaylibTypes()
         sol::meta_function::to_string,
         [](const Rectangle& rectangle) -> std::string
         {
-            return "Rectangle {x: " + std::to_string(rectangle.x) + " y: "
-                   + std::to_string(rectangle.y) + " width: " + std::to_string(rectangle.width)
+            return "{x: " + std::to_string(rectangle.x) + " y: " + std::to_string(rectangle.y)
+                   + " width: " + std::to_string(rectangle.width)
                    + " height: " + std::to_string(rectangle.height) + "}";
         });
 
@@ -355,6 +385,7 @@ void LuaManager::InitScene()
     auto scene = instance_->lua_.new_usertype<interfaces::Scene>("Scene");
     scene.set_function("getEntityManager", &interfaces::Scene::getEntityManager);
     scene.set_function("getEventQueue", &interfaces::Scene::getEventQueue);
+    scene.set_function("getApplication", &interfaces::Scene::getApplication);
 
     auto eventQueue = instance_->lua_.new_usertype<events::EventQueue>("EventQueue");
     REGISTER_EVENT_TYPE(instance_->lua_, MouseEvent, Vector2, std::int32_t)
@@ -387,10 +418,10 @@ void LuaManager::InitEventTypes()
         sol::base_classes, sol::bases<events::Event>(),
         "key", &events::KeyEvent::key);
 
-    instance_->lua_.set_function("as_mouse_event", [](std::shared_ptr<events::Event> event)
+    instance_->lua_.set_function("as_mouse_event", [](const std::shared_ptr<events::Event>& event)
                                  { return std::dynamic_pointer_cast<events::MouseEvent>(event); });
 
-    instance_->lua_.set_function("as_keyboard_event", [](std::shared_ptr<events::Event> event)
+    instance_->lua_.set_function("as_keyboard_event", [](const std::shared_ptr<events::Event>& event)
                                  { return std::dynamic_pointer_cast<events::KeyEvent>(event); });
 
     // clang-format on

@@ -5,8 +5,9 @@
 namespace roen::interfaces
 {
 
-Scene::Scene(manager::GameSceneManager& gameSceneManager)
-    : gameSceneManager_{gameSceneManager}
+Scene::Scene(manager::GameSceneManager& gameSceneManager, Application* application)
+    : application_{application}
+    , gameSceneManager_{gameSceneManager}
 {
     lua::LuaManager::Instance().onInit(this);
 }
@@ -14,6 +15,11 @@ Scene::Scene(manager::GameSceneManager& gameSceneManager)
 ecs::EntityManager& Scene::getEntityManager()
 {
     return entityManager_;
+}
+
+Application* Scene::getApplication() const
+{
+    return application_;
 }
 
 events::EventQueue& Scene::getEventQueue()

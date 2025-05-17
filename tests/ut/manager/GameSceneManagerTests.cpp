@@ -13,9 +13,10 @@ namespace interfaces
 class SceneMock final : public Scene
 {
 public:
-    explicit SceneMock(manager::GameSceneManager& manager)
-        : Scene(manager) {};
+    explicit SceneMock(manager::GameSceneManager& manager, Application* application = nullptr)
+        : Scene(manager, application) {};
 
+    MOCK_METHOD(void, onInit, (), (override));
     MOCK_METHOD(void, handleInput, (), (override));
     MOCK_METHOD(void, render, (), (override));
     MOCK_METHOD(void, update, (), (override));

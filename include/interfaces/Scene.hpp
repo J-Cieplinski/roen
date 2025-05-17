@@ -5,10 +5,16 @@
 #include <ecs/EntityManager.hpp>
 #include <events/EventQueue.hpp>
 
-namespace roen::manager
+namespace roen
+{
+
+class Application;
+
+namespace manager
 {
 class GameSceneManager;
-}  // namespace roen::manager
+}
+}  // namespace roen
 
 namespace roen::interfaces
 {
@@ -16,11 +22,12 @@ namespace roen::interfaces
 class Scene
 {
 public:
-    explicit Scene(manager::GameSceneManager& gameSceneManager);
+    explicit Scene(manager::GameSceneManager& gameSceneManager, Application* application);
 
     virtual ~Scene() = default;
 
     ecs::EntityManager& getEntityManager();
+    Application* getApplication() const;
     events::EventQueue& getEventQueue();
     virtual void onInit() = 0;
     virtual void handleInput() = 0;
@@ -31,6 +38,7 @@ public:
     virtual void quit() = 0;
 
 protected:
+    Application* application_;
     manager::GameSceneManager& gameSceneManager_;
     ecs::EntityManager entityManager_;
     data_structure::SystemsContainer systems_;
