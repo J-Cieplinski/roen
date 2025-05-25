@@ -8,7 +8,7 @@
 namespace roen::interfaces
 {
 
-constexpr std::string DefaultAssetName{"DefaultAsset"};
+constexpr std::string_view DefaultAssetName{"DefaultAsset"};
 constexpr std::uint64_t DefaultAssetID{hashString(DefaultAssetName)};
 
 class IAsset

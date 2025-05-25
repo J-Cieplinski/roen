@@ -1,5 +1,6 @@
 #include <lua/LuaEntityHandle.hpp>
 
+#include <ecs/Entity.hpp>
 #include <ecs/components/TransformComponent.hpp>
 
 #include <log/Logger.hpp>

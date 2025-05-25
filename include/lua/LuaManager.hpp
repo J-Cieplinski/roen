@@ -3,11 +3,14 @@
 
 #include <lua/LuaCallable.hpp>
 
-#include <interfaces/Scene.hpp>
-
 #include <memory>
 
 #include <sol2/sol.hpp>
+
+namespace roen::interfaces
+{
+class Scene;
+}
 
 namespace roen::lua
 {

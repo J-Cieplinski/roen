@@ -1,9 +1,12 @@
 #ifndef ROEN_LUA_LUA_ENTITY_HANDLE_HPP
 #define ROEN_LUA_LUA_ENTITY_HANDLE_HPP
 
-#include <ecs/Entity.hpp>
-
 #include <cstdint>
+
+namespace roen::ecs
+{
+class Entity;
+}
 
 namespace roen::lua
 {

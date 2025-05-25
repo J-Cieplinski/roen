@@ -5,6 +5,7 @@
 #include <Application.hpp>
 
 #include <core/AssetManager.hpp>
+#include <core/AudioPlayer.hpp>
 #include <core/Input.hpp>
 #include <core/KeyCodes.hpp>
 
@@ -19,9 +20,13 @@
 #include <events/KeyEvent.hpp>
 #include <events/MouseEvent.hpp>
 
+#include <interfaces/Scene.hpp>
+
 #include <log/Logger.hpp>
 
 #include <Utils.hpp>
+
+#include "core/AudioPlayer.hpp"
 
 namespace roen::lua
 {
@@ -105,6 +110,18 @@ void LuaManager::InitLuaAssets()
     SET_ASSET_MANAGER_FUNC(TextureManager)
     SET_ASSET_MANAGER_FUNC(FontManager)
     SET_ASSET_MANAGER_FUNC(MusicManager)
+
+    auto audioPlayer = instance_->lua_["AudioPlayer"].get_or_create<sol::table>();
+    audioPlayer.set_function("PlaySound",
+                             [](std::string_view sound) { AudioPlayer::PlaySound(sound); });
+    audioPlayer.set_function("StopSound",
+                             [](std::string_view sound) { AudioPlayer::StopSound(sound); });
+    audioPlayer.set_function("PlayMusic",
+                             [](std::string_view music) { AudioPlayer::PlayMusic(music); });
+    audioPlayer.set_function("StopMusic",
+                             [](std::string_view music) { AudioPlayer::StopMusic(music); });
+    audioPlayer.set_function("PauseMusic", [] { AudioPlayer::PauseMusic(); });
+    audioPlayer.set_function("ResumeMusic", [] { AudioPlayer::ResumeMusic(); });
 }
 
 void LuaManager::InitLuaInput()

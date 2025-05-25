@@ -2,6 +2,8 @@
 
 #include <Application.hpp>
 
+#include <core/AudioPlayer.hpp>
+
 namespace roen
 {
 
@@ -20,6 +22,8 @@ Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
     soundManager_ = std::make_shared<SoundManager>();
     musicManager_ = std::make_shared<MusicManager>();
     fontManager_ = std::make_shared<FontManager>();
+
+    AudioPlayer::Init(soundManager_, musicManager_);
 }
 
 Application::~Application()
@@ -40,6 +44,7 @@ void Application::run()
             isRunning_ = !WindowShouldClose();
             gameSceneManager_.update();
             auto& currentScene = gameSceneManager_.getCurrentScene();
+            AudioPlayer::UpdateMusicStream();
             currentScene.handleInput();
             currentScene.update();
             currentScene.render();

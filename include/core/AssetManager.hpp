@@ -5,7 +5,6 @@
 #include <log/Logger.hpp>
 
 #include <filesystem>
-#include <optional>
 #include <stdexcept>
 #include <typeindex>
 #include <unordered_map>
@@ -22,7 +21,7 @@ class IAssetManager
 {
 public:
     virtual ~IAssetManager() = default;
-    virtual void loadAsset(const std::string& id, const std::filesystem::path& path) = 0;
+    virtual void loadAsset(std::string_view id, const std::filesystem::path& path) = 0;
     virtual void freeAssets() = 0;
 };
 
@@ -33,7 +32,7 @@ public:
     AssetManager();
     ~AssetManager() override;
 
-    void loadAsset(const std::string& id, const std::filesystem::path& path) override;
+    void loadAsset(std::string_view id, const std::filesystem::path& path) override;
     void freeAssets() override;
     const AssetType& getAsset(std::string_view id) const;
 
@@ -78,7 +77,7 @@ void AssetManager<AssetType>::freeAssets()
 }
 
 template <DerivedFromIAsset AssetType>
-void AssetManager<AssetType>::loadAsset(const std::string& id, const std::filesystem::path& path)
+void AssetManager<AssetType>::loadAsset(std::string_view id, const std::filesystem::path& path)
 {
     auto hashedString = hashString(id);
     if (assets_.contains(hashedString))
