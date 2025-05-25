@@ -32,6 +32,11 @@ void AudioPlayer::PlayMusic(std::string_view asset)
 
 void AudioPlayer::StopMusic(std::string_view asset)
 {
+    if (activeMusic == "")
+    {
+        return;
+    }
+
     SDK_INFO("Stopping music \"{0}\"", asset);
     StopMusicStream(musicAssetManager_->getAsset(asset));
     musicPlaying_ = false;

@@ -31,7 +31,6 @@ public:
     events::EventQueue& getEventQueue();
     virtual void onInit() = 0;
     virtual void handleInput() = 0;
-    virtual void render() = 0;
     virtual void update() = 0;
     virtual void obscured() = 0;
     virtual void revealed() = 0;

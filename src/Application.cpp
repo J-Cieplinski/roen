@@ -3,12 +3,14 @@
 #include <Application.hpp>
 
 #include <core/AudioPlayer.hpp>
+#include <core/Renderer.hpp>
 
 namespace roen
 {
 
 Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
-                         const std::string& windowTitle)
+                         std::uint32_t renderWidth, std::uint32_t renderHeight,
+                         std::string_view windowTitle)
     : isRunning_{true}
 {
 #ifdef IS_DEBUG
@@ -16,12 +18,19 @@ Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
 #endif
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(windowWith, windowHeight, windowTitle.c_str());
+    InitWindow(windowWith, windowHeight, windowTitle.data());
     InitAudioDevice();
     textureManager_ = std::make_shared<TextureManager>();
     soundManager_ = std::make_shared<SoundManager>();
     musicManager_ = std::make_shared<MusicManager>();
     fontManager_ = std::make_shared<FontManager>();
+
+    RenderContext context{
+        .renderWidth = renderWidth,
+        .renderHeight = renderHeight,
+    };
+
+    renderer_ = std::make_unique<Renderer>(context);
 
     AudioPlayer::Init(soundManager_, musicManager_);
 }
@@ -31,6 +40,16 @@ Application::~Application()
     gameSceneManager_.shutdown();
     CloseAudioDevice();
     CloseWindow();
+}
+
+void Application::onRender()
+{
+    renderer_->onRender(gameSceneManager_.getCurrentScene().getEntityManager());
+}
+
+void Application::onGuiRender()
+{
+    renderer_->onRenderGui(gameSceneManager_.getCurrentScene().getEntityManager());
 }
 
 void Application::run()
@@ -47,7 +66,9 @@ void Application::run()
             AudioPlayer::UpdateMusicStream();
             currentScene.handleInput();
             currentScene.update();
-            currentScene.render();
+
+            onRender();
+            onGuiRender();
         }
         catch (std::exception& e)
         {
