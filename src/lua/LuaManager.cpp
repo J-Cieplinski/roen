@@ -345,6 +345,9 @@ void LuaManager::InitECS()
     auto entity = instance_->lua_.new_usertype<ecs::Entity>(
         "Entity", sol::constructors<sol::types<entt::entity, entt::registry&>>());
 
+    entity.set_function("addChild", &ecs::Entity::addChild);
+    entity.set_function("setParent", &ecs::Entity::setParent);
+
     auto graphicsComponent = instance_->lua_.new_usertype<ecs::components::GraphicsComponent>(
         "GraphicsComponent",
         sol::constructors<sol::types<const std::string&, Rectangle>,

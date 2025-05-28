@@ -1,19 +1,20 @@
 ---
-  BasedOnStyle: Google
-  AccessModifierOffset: '-4'
-  AlignAfterOpenBracket: 'Align'
-  AlignTrailingComments: 'true'
-  AllowAllParametersOfDeclarationOnNextLine: 'false'
-  AllowShortFunctionsOnASingleLine: 'None'
-  BreakTemplateDeclarations: 'Yes'
-  BreakBeforeBraces: 'Allman'
-  BreakBeforeBinaryOperators: All
-  BreakBeforeTernaryOperators: 'true'
-  BreakConstructorInitializers: 'BeforeComma'
-  ColumnLimit: '100'
-  IncludeBlocks: Preserve
-  IndentPPDirectives: AfterHash
-  IndentWidth: '4'
-  NamespaceIndentation: None
-  PackConstructorInitializers: 'Never'
+BasedOnStyle: Google
+AccessModifierOffset: '-4'
+AlignAfterOpenBracket: 'Align'
+AlignTrailingComments: 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'false'
+AllowShortFunctionsOnASingleLine: 'InlineOnly'
+BreakTemplateDeclarations: 'Yes'
+BreakBeforeBraces: 'Allman'
+BreakBeforeBinaryOperators: All
+BreakBeforeTernaryOperators: 'true'
+BreakConstructorInitializers: 'BeforeComma'
+ColumnLimit: '100'
+IncludeBlocks: Preserve
+SortIncludes: 'true'
+IndentPPDirectives: AfterHash
+IndentWidth: '4'
+NamespaceIndentation: None
+PackConstructorInitializers: 'Never'
 ...

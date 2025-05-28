@@ -23,7 +23,7 @@ struct GraphicsComponent
     GraphicsComponent(const std::string& str, Rectangle srcRectangle)
         : GraphicsComponent{str, srcRectangle, 0}
     {
-        SDK_TRACE("Construced GraphicsComponent with str: {}", str);
+        SDK_TRACE("Constructed GraphicsComponent with str: {}", str);
     }
 
     GraphicsComponent(const std::string& str, Rectangle srcRectangle, std::uint8_t zLayer)
@@ -33,15 +33,9 @@ struct GraphicsComponent
     {
     }
 
-    operator Rectangle&()
-    {
-        return srcRectangle;
-    }
+    operator Rectangle&() { return srcRectangle; }
 
-    operator const Rectangle() const
-    {
-        return srcRectangle;
-    }
+    operator const Rectangle() const { return srcRectangle; }
 
     bool operator==(const GraphicsComponent& other) const
     {

@@ -7,6 +7,7 @@ target_sources(${PROJECT_NAME}
     ${INCLUDE_DIR}/core/Input.hpp
     ${INCLUDE_DIR}/core/KeyCodes.hpp
     ${INCLUDE_DIR}/core/Renderer.hpp
+    ${INCLUDE_DIR}/core/SceneGraph.hpp
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Assets.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/AudioPlayer.cpp

@@ -1,8 +1,6 @@
 #ifndef ROEN_ECS_ENTITY_HPP
 #define ROEN_ECS_ENTITY_HPP
 
-#include <interfaces/Scene.hpp>
-
 #include <Utils.hpp>
 #include <log/formatters/entity.hpp>
 
@@ -36,6 +34,9 @@ public:
     template <typename Component>
     void removeComponent();
 
+    void addChild(Entity child) const;
+    void setParent(Entity parent) const;
+
     template <typename Component>
     [[nodiscard("Error should be handled")]]
     std::expected<std::reference_wrapper<Component>, Error> getComponentMaybe();
@@ -46,6 +47,8 @@ public:
     bool operator==(const Entity&) const;
 
 private:
+    void updateHierarchy(const Entity parent, const Entity child) const;
+
     entt::entity entity_;
     entt::registry& registry_;
 };

@@ -27,7 +27,6 @@ void Renderer::render(entt::registry& registry)
 {
     float scale = std::min(static_cast<float>(GetScreenWidth()) / context_.renderWidth,
                            static_cast<float>(GetScreenHeight()) / context_.renderHeight);
-
     BeginTextureMode(renderTexture_);
     ClearBackground(YELLOW);
 
