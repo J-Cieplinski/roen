@@ -3,7 +3,7 @@
 #include <Application.hpp>
 
 #include <core/AudioPlayer.hpp>
-#include <core/Renderer.hpp>
+#include <core/render/RaylibRenderer.hpp>
 
 namespace roen
 {
@@ -30,7 +30,7 @@ Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
         .renderHeight = renderHeight,
     };
 
-    renderer_ = std::make_unique<Renderer>(context);
+    renderer_ = std::make_unique<RaylibRenderer>(context);
 
     AudioPlayer::Init(soundManager_, musicManager_);
 }

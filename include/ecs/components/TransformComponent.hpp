@@ -1,29 +1,20 @@
 #ifndef ROEN_ECS_COMPONENTS_TRANSFORM_COMPONENT_HPP
 #define ROEN_ECS_COMPONENTS_TRANSFORM_COMPONENT_HPP
 
-#include <raymath.h>
+#include <math/Types.hpp>
 
 namespace roen::ecs::components
 {
 
 struct TransformComponent
 {
-    operator Vector2&()
-    {
-        return transform;
-    }
+    operator math::Vector2&() { return transform; }
 
-    operator const Vector2() const
-    {
-        return transform;
-    }
+    operator const math::Vector2() const { return transform; }
 
-    bool operator==(const TransformComponent& other)
-    {
-        return transform == other.transform;
-    }
+    bool operator==(const TransformComponent& other) const { return transform == other.transform; }
 
-    Vector2 transform{Vector2Zero()};
+    math::Vector2 transform;
 };
 
 }  // namespace roen::ecs::components

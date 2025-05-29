@@ -12,6 +12,8 @@ add_subdirectory(manager)
 target_sources(${PROJECT_NAME}
     PUBLIC
     ${INCLUDE_DIR}/Application.hpp
+    ${INCLUDE_DIR}/math/Types.hpp
+    ${INCLUDE_DIR}/math/decorators/RaylibDecorators.hpp
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Application.cpp
 )

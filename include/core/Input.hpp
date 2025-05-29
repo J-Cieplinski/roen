@@ -3,7 +3,7 @@
 
 #include <core/KeyCodes.hpp>
 
-#include <raylib.h>
+#include <math/Types.hpp>
 
 namespace roen
 {
@@ -20,11 +20,13 @@ public:
     static bool MouseButtonPressed(KeyCodes::MouseButton button);
     static bool MouseButtonReleased(KeyCodes::MouseButton button);
     static bool MouseButtonDown(KeyCodes::MouseButton button);
-    static Vector2 MousePosition();
+    static math::Vector2 MousePosition();
 
 private:
+    // TODO: this can be abstracted to implementation with raylib code
     static int GetRaylibKey(KeyCodes::Key key);
     static int GetRaylibButton(KeyCodes::MouseButton button);
+    static math::Vector2 GetRaylibMousePosition();
     static KeyCodes::Key GetRoenKey(int key);
     static KeyCodes::MouseButton GetRoenButton(int key);
 };

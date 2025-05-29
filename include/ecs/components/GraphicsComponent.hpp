@@ -3,7 +3,7 @@
 
 #include <Utils.hpp>
 
-#include <raylib.h>
+#include <math/Types.hpp>
 
 #include <cstdint>
 #include <string>
@@ -20,32 +20,29 @@ struct GraphicsComponent
     {
     }
 
-    GraphicsComponent(const std::string& str, Rectangle srcRectangle)
+    GraphicsComponent(const std::string& str, math::Rectangle srcRectangle)
         : GraphicsComponent{str, srcRectangle, 0}
     {
         SDK_TRACE("Constructed GraphicsComponent with str: {}", str);
     }
 
-    GraphicsComponent(const std::string& str, Rectangle srcRectangle, std::uint8_t zLayer)
+    GraphicsComponent(const std::string& str, math::Rectangle srcRectangle, std::uint8_t zLayer)
         : srcRectangle{srcRectangle}
         , zLayer{zLayer}
         , guid{hashString(str)}
     {
     }
 
-    operator Rectangle&() { return srcRectangle; }
+    operator math::Rectangle&() { return srcRectangle; }
 
-    operator const Rectangle() const { return srcRectangle; }
+    operator const math::Rectangle() const { return srcRectangle; }
 
     bool operator==(const GraphicsComponent& other) const
     {
-        return srcRectangle.height == other.srcRectangle.height
-               and srcRectangle.width == other.srcRectangle.width
-               and srcRectangle.x == other.srcRectangle.x and srcRectangle.y == other.srcRectangle.y
-               and zLayer == other.zLayer and guid == other.guid;
+        return srcRectangle == other.srcRectangle and zLayer == other.zLayer and guid == other.guid;
     }
 
-    Rectangle srcRectangle;
+    math::Rectangle srcRectangle;
     std::uint8_t zLayer;
     std::uint64_t guid;
 };

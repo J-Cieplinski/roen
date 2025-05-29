@@ -42,7 +42,7 @@ namespace roen::lua
         entity_type.set_function(CONCAT(get, Comp), [](ecs::Entity& self) -> component::Comp&     \
                                  { return std::ref(self.getComponent<component::Comp>()); });     \
         entity_type.set_function(CONCAT(add, Comp), &ecs::Entity::addComponent<component::Comp>); \
-        entity_type.set_function(CONCAT(has, Comp), sol::overload(__VA_ARGS__));                  \
+        entity_type.set_function(CONCAT(add, Comp), sol::overload(__VA_ARGS__));                  \
         entity_type.set_function(CONCAT(has, Comp), &ecs::Entity::hasComponent<component::Comp>); \
     }
 
@@ -74,7 +74,7 @@ void LuaManager::onInit(interfaces::Scene* scene)
     InitEventTypes();
     InitECS();
     InitScene();
-    InitRaylibTypes();
+    InitMathTypes();
     InitLuaEventHandler();
     InitUtils();
 }
@@ -147,7 +147,7 @@ void LuaManager::InitLuaInput()
     input.set_function("MouseButtonDown", [](KeyCodes::MouseButton button) -> bool
                        { return Input::MouseButtonDown(button); });
 
-    input.set_function("MousePosition", []() -> Vector2 { return Input::MousePosition(); });
+    input.set_function("MousePosition", []() -> math::Vector2 { return Input::MousePosition(); });
 
     std::initializer_list<std::pair<sol::string_view, KeyCodes::Key>> keyItems
         = {{"NONE", KeyCodes::Key::NONE},
@@ -303,30 +303,30 @@ void LuaManager::InitLuaLog()
     SET_LOGGER_FUNC(LUA_CRITICAL, Critical)
 }
 
-void LuaManager::InitRaylibTypes()
+void LuaManager::InitMathTypes()
 {
-    auto vec2 = instance_->lua_.new_usertype<Vector2>(
-        "Vector2", sol::constructors<Vector2(float, float)>(), sol::meta_function::to_string,
-        [](const Vector2& vec) -> std::string
+    auto vec2 = instance_->lua_.new_usertype<math::Vector2>(
+        "Vector2", sol::constructors<math::Vector2(float, float)>(), sol::meta_function::to_string,
+        [](const math::Vector2& vec) -> std::string
         { return "{x: " + std::to_string(vec.x) + " y: " + std::to_string(vec.y) + "}"; });
 
-    vec2["x"] = &Vector2::x;
-    vec2["y"] = &Vector2::y;
+    vec2["x"] = &math::Vector2::x;
+    vec2["y"] = &math::Vector2::y;
 
-    auto rec = instance_->lua_.new_usertype<Rectangle>(
-        "Rectangle", sol::constructors<Rectangle(float, float, float, float)>(),
+    auto rec = instance_->lua_.new_usertype<math::Rectangle>(
+        "Rectangle", sol::constructors<math::Rectangle(float, float, float, float)>(),
         sol::meta_function::to_string,
-        [](const Rectangle& rectangle) -> std::string
+        [](const math::Rectangle& rectangle) -> std::string
         {
             return "{x: " + std::to_string(rectangle.x) + " y: " + std::to_string(rectangle.y)
                    + " width: " + std::to_string(rectangle.width)
                    + " height: " + std::to_string(rectangle.height) + "}";
         });
 
-    rec["x"] = &Rectangle::x;
-    rec["y"] = &Rectangle::y;
-    rec["width"] = &Rectangle::width;
-    rec["height"] = &Rectangle::height;
+    rec["x"] = &math::Rectangle::x;
+    rec["y"] = &math::Rectangle::y;
+    rec["width"] = &math::Rectangle::width;
+    rec["height"] = &math::Rectangle::height;
 }
 
 void LuaManager::InitLuaEventHandler()
@@ -350,8 +350,8 @@ void LuaManager::InitECS()
 
     auto graphicsComponent = instance_->lua_.new_usertype<ecs::components::GraphicsComponent>(
         "GraphicsComponent",
-        sol::constructors<sol::types<const std::string&, Rectangle>,
-                          sol::types<const std::string&, Rectangle, std::uint8_t>>());
+        sol::constructors<sol::types<const std::string&, math::Rectangle>,
+                          sol::types<const std::string&, math::Rectangle, std::uint8_t>>());
 
     graphicsComponent["srcRectangle"] = &ecs::components::GraphicsComponent::srcRectangle;
     graphicsComponent["zLayer"] = &ecs::components::GraphicsComponent::zLayer;
@@ -359,18 +359,18 @@ void LuaManager::InitECS()
 
     REGISTER_COMPONENT_WITH_ECS(
         instance_->lua_, GraphicsComponent,
-        [](ecs::Entity& self, const std::string& str, const Rectangle& rect)
+        [](ecs::Entity& self, const std::string& str, const math::Rectangle& rect)
         { return std::ref(self.addComponent<ecs::components::GraphicsComponent>(str, rect)); },
-        [](ecs::Entity& self, const std::string& str, const Rectangle& rect, std::uint8_t z)
+        [](ecs::Entity& self, const std::string& str, const math::Rectangle& rect, std::uint8_t z)
         { return std::ref(self.addComponent<ecs::components::GraphicsComponent>(str, rect, z)); });
 
     auto transformComponent = instance_->lua_.new_usertype<ecs::components::TransformComponent>(
-        "TransformComponent", sol::constructors<sol::types<Vector2>>());
+        "TransformComponent", sol::constructors<sol::types<math::Vector2>>());
 
     transformComponent["transform"] = &ecs::components::TransformComponent::transform;
 
     REGISTER_COMPONENT_WITH_ECS(
-        instance_->lua_, TransformComponent, [](ecs::Entity& self, const Vector2& vec)
+        instance_->lua_, TransformComponent, [](ecs::Entity& self, const math::Vector2& vec)
         { return std::ref(self.addComponent<ecs::components::TransformComponent>(vec)); });
 
     auto factionComponent = instance_->lua_.new_usertype<ecs::components::FactionComponent>(
@@ -379,7 +379,7 @@ void LuaManager::InitECS()
     factionComponent["factionMask"] = &ecs::components::FactionComponent::factionMask;
 
     REGISTER_COMPONENT_WITH_ECS(
-        instance_->lua_, FactionComponent, [](ecs::Entity& self, const std::bitset<8>& mask)
+        instance_->lua_, FactionComponent, [](ecs::Entity& self, const std::uint8_t& mask)
         { return std::ref(self.addComponent<ecs::components::FactionComponent>(mask)); });
 }
 
@@ -408,7 +408,7 @@ void LuaManager::InitScene()
     scene.set_function("getApplication", &interfaces::Scene::getApplication);
 
     auto eventQueue = instance_->lua_.new_usertype<events::EventQueue>("EventQueue");
-    REGISTER_EVENT_TYPE(instance_->lua_, MouseEvent, Vector2, std::int32_t)
+    REGISTER_EVENT_TYPE(instance_->lua_, MouseEvent, math::Vector2, std::int32_t)
     REGISTER_EVENT_TYPE(instance_->lua_, KeyEvent, KeyCodes::Key)
 }
 
@@ -428,7 +428,7 @@ void LuaManager::InitEventTypes()
         "ToString", &events::Event::ToString);
 
     instance_->lua_.new_usertype<events::MouseEvent>("MouseEvent",
-        sol::constructors<events::MouseEvent(Vector2, std::int32_t)>(),
+        sol::constructors<events::MouseEvent(math::Vector2, std::int32_t)>(),
         sol::base_classes, sol::bases<events::Event>(),
         "position", &events::MouseEvent::position,
         "mouseButton", &events::MouseEvent::mouseButton);

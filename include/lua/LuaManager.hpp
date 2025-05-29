@@ -52,7 +52,7 @@ private:
     static void InitEventTypes();
     static void InitECS();
     static void InitScene();
-    static void InitRaylibTypes();
+    static void InitMathTypes();
     static void InitLuaEventHandler();
     static void InitUtils();
 

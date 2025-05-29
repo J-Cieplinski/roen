@@ -11,7 +11,7 @@
 namespace roen
 {
 
-class Renderer;
+class RaylibRenderer;
 
 class Application
 {
@@ -35,7 +35,7 @@ protected:
     std::shared_ptr<FontManager> fontManager_;
     std::shared_ptr<MusicManager> musicManager_;
     manager::GameSceneManager gameSceneManager_;
-    std::unique_ptr<Renderer> renderer_;
+    std::unique_ptr<RaylibRenderer> renderer_;
     bool isRunning_;
 };
 

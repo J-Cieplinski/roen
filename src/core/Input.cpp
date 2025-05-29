@@ -1,5 +1,7 @@
 #include <core/Input.hpp>
 
+#include <math/decorators/RaylibDecorators.hpp>
+
 namespace roen
 {
 
@@ -38,9 +40,9 @@ bool Input::MouseButtonDown(KeyCodes::MouseButton button)
     return IsMouseButtonDown(GetRaylibButton(button));
 }
 
-Vector2 Input::MousePosition()
+math::Vector2 Input::MousePosition()
 {
-    return GetMousePosition();
+    return GetRaylibMousePosition();
 }
 
 int Input::GetRaylibKey(KeyCodes::Key key)
@@ -51,6 +53,11 @@ int Input::GetRaylibKey(KeyCodes::Key key)
 int Input::GetRaylibButton(KeyCodes::MouseButton button)
 {
     return static_cast<int>(button);
+}
+
+math::Vector2 Input::GetRaylibMousePosition()
+{
+    return RaylibVector2{GetMousePosition()};
 }
 
 KeyCodes::Key Input::GetRoenKey(int key)

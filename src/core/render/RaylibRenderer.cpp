@@ -1,4 +1,7 @@
-#include <core/Renderer.hpp>
+#include <../../../include/core/render/RaylibRenderer.hpp>
+
+#include <math/Types.hpp>
+#include <math/decorators/RaylibDecorators.hpp>
 
 #include <entt/entt.hpp>
 
@@ -7,23 +10,23 @@
 namespace roen
 {
 
-Renderer::Renderer(RenderContext context)
+RaylibRenderer::RaylibRenderer(RenderContext context)
     : context_(std::move(context))
     , renderTexture_(LoadRenderTexture(context_.renderWidth, context_.renderHeight))
 {
 }
 
-void Renderer::onRender(entt::registry& registry)
+void RaylibRenderer::onRender(entt::registry& registry)
 {
     render(registry);
 }
 
-void Renderer::onRenderGui(entt::registry& registry)
+void RaylibRenderer::onRenderGui(entt::registry& registry)
 {
     renderGui(registry);
 }
 
-void Renderer::render(entt::registry& registry)
+void RaylibRenderer::render(entt::registry& registry)
 {
     float scale = std::min(static_cast<float>(GetScreenWidth()) / context_.renderWidth,
                            static_cast<float>(GetScreenHeight()) / context_.renderHeight);
@@ -50,7 +53,7 @@ void Renderer::render(entt::registry& registry)
     EndDrawing();
 }
 
-void Renderer::renderGui(entt::registry& registry)
+void RaylibRenderer::renderGui(entt::registry& registry)
 {
 }
 

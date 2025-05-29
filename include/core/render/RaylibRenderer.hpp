@@ -13,10 +13,10 @@ struct RenderContext
     std::uint32_t renderHeight;
 };
 
-class Renderer
+class RaylibRenderer
 {
 public:
-    Renderer(RenderContext context);
+    RaylibRenderer(RenderContext context);
 
     void onRender(entt::registry& registry);
     void onRenderGui(entt::registry& registry);

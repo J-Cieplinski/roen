@@ -3,7 +3,7 @@
 
 #include <events/Event.hpp>
 
-#include <raymath.h>
+#include <math/Types.hpp>
 
 #include <cstdint>
 
@@ -12,7 +12,7 @@ namespace roen::events
 
 struct MouseEvent final : public Event
 {
-    MouseEvent(Vector2 pos, std::int32_t button)
+    MouseEvent(math::Vector2 pos, std::int32_t button)
         : position{pos}
         , mouseButton{button}
     {
@@ -20,7 +20,7 @@ struct MouseEvent final : public Event
 
     EVENT_CLASS_TYPE(MouseEvent)
 
-    Vector2 position;
+    math::Vector2 position;
     std::int32_t mouseButton;
 };
 
