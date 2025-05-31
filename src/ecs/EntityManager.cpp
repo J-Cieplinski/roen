@@ -12,7 +12,7 @@ namespace roen::ecs
 
 EntityManager::EntityManager()
 {
-    registry_.on_construct<components::GraphicsComponent>()
+    registry_.on_construct<components::TransformComponent>()
         .connect<[&](entt::registry& reg, entt::entity e)
                  { reg.emplace<components::DirtyComponent>(e); }>();
 }

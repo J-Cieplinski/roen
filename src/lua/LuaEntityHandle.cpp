@@ -25,8 +25,8 @@ void LuaEntityHandle::setTransform(std::uint32_t x, std::uint32_t y)
 
     auto& transformComponent = transform.value().get();
 
-    transformComponent.transform.x = x;
-    transformComponent.transform.y = y;
+    transformComponent.position.x = x;
+    transformComponent.position.y = y;
 }
 
 }  // namespace roen::lua

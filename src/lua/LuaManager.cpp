@@ -183,6 +183,7 @@ void LuaManager::InitLuaInput()
            {"N", KeyCodes::Key::N},
            {"O", KeyCodes::Key::O},
            {"P", KeyCodes::Key::P},
+           {"Q", KeyCodes::Key::Q},
            {"R", KeyCodes::Key::R},
            {"S", KeyCodes::Key::S},
            {"T", KeyCodes::Key::T},
@@ -308,7 +309,9 @@ void LuaManager::InitMathTypes()
     auto vec2 = instance_->lua_.new_usertype<math::Vector2>(
         "Vector2", sol::constructors<math::Vector2(float, float)>(), sol::meta_function::to_string,
         [](const math::Vector2& vec) -> std::string
-        { return "{x: " + std::to_string(vec.x) + " y: " + std::to_string(vec.y) + "}"; });
+        { return "{x: " + std::to_string(vec.x) + " y: " + std::to_string(vec.y) + "}"; },
+        sol::meta_function::addition, &math::Vector2::operator+, sol::meta_function::subtraction,
+        &math::Vector2::operator-, sol::meta_function::equal_to, &math::Vector2::operator==);
 
     vec2["x"] = &math::Vector2::x;
     vec2["y"] = &math::Vector2::y;
@@ -321,7 +324,8 @@ void LuaManager::InitMathTypes()
             return "{x: " + std::to_string(rectangle.x) + " y: " + std::to_string(rectangle.y)
                    + " width: " + std::to_string(rectangle.width)
                    + " height: " + std::to_string(rectangle.height) + "}";
-        });
+        },
+        sol::meta_function::equal_to, &math::Rectangle::operator==);
 
     rec["x"] = &math::Rectangle::x;
     rec["y"] = &math::Rectangle::y;
@@ -350,24 +354,27 @@ void LuaManager::InitECS()
 
     auto graphicsComponent = instance_->lua_.new_usertype<ecs::components::GraphicsComponent>(
         "GraphicsComponent",
-        sol::constructors<sol::types<const std::string&, math::Rectangle>,
-                          sol::types<const std::string&, math::Rectangle, std::uint8_t>>());
+        sol::constructors<sol::types<std::string_view, math::Rectangle>,
+                          sol::types<std::string_view, math::Rectangle, std::uint8_t>>());
 
     graphicsComponent["srcRectangle"] = &ecs::components::GraphicsComponent::srcRectangle;
-    graphicsComponent["zLayer"] = &ecs::components::GraphicsComponent::zLayer;
     graphicsComponent["guid"] = &ecs::components::GraphicsComponent::guid;
 
     REGISTER_COMPONENT_WITH_ECS(
         instance_->lua_, GraphicsComponent,
         [](ecs::Entity& self, const std::string& str, const math::Rectangle& rect)
         { return std::ref(self.addComponent<ecs::components::GraphicsComponent>(str, rect)); },
-        [](ecs::Entity& self, const std::string& str, const math::Rectangle& rect, std::uint8_t z)
-        { return std::ref(self.addComponent<ecs::components::GraphicsComponent>(str, rect, z)); });
+        [](ecs::Entity& self, const std::string& str, const math::Rectangle& rect)
+        { return std::ref(self.addComponent<ecs::components::GraphicsComponent>(str, rect)); });
 
     auto transformComponent = instance_->lua_.new_usertype<ecs::components::TransformComponent>(
-        "TransformComponent", sol::constructors<sol::types<math::Vector2>>());
+        "TransformComponent",
+        sol::constructors<sol::types<math::Vector2, math::Vector2, float, std::uint8_t>>());
 
-    transformComponent["transform"] = &ecs::components::TransformComponent::transform;
+    transformComponent["transform"] = &ecs::components::TransformComponent::position;
+    transformComponent["scale"] = &ecs::components::TransformComponent::scale;
+    transformComponent["rotation"] = &ecs::components::TransformComponent::rotation;
+    transformComponent["zLayer"] = &ecs::components::TransformComponent::zLayer;
 
     REGISTER_COMPONENT_WITH_ECS(
         instance_->lua_, TransformComponent, [](ecs::Entity& self, const math::Vector2& vec)

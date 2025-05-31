@@ -15,21 +15,19 @@ struct GraphicsComponent
 {
     GraphicsComponent()
         : srcRectangle{0, 0, 0, 0}
-        , zLayer{0}
-        , guid{0}
+        , guid{""}
     {
     }
 
-    GraphicsComponent(const std::string& str, math::Rectangle srcRectangle)
+    GraphicsComponent(std::string_view str, math::Rectangle srcRectangle)
         : GraphicsComponent{str, srcRectangle, 0}
     {
         SDK_TRACE("Constructed GraphicsComponent with str: {}", str);
     }
 
-    GraphicsComponent(const std::string& str, math::Rectangle srcRectangle, std::uint8_t zLayer)
+    GraphicsComponent(std::string_view str, math::Rectangle srcRectangle, std::uint8_t zLayer)
         : srcRectangle{srcRectangle}
-        , zLayer{zLayer}
-        , guid{hashString(str)}
+        , guid{str}
     {
     }
 
@@ -39,12 +37,11 @@ struct GraphicsComponent
 
     bool operator==(const GraphicsComponent& other) const
     {
-        return srcRectangle == other.srcRectangle and zLayer == other.zLayer and guid == other.guid;
+        return srcRectangle == other.srcRectangle and guid == other.guid;
     }
 
     math::Rectangle srcRectangle;
-    std::uint8_t zLayer;
-    std::uint64_t guid;
+    std::string guid;
 };
 
 }  // namespace roen::ecs::components

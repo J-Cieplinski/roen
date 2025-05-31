@@ -30,7 +30,7 @@ Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
         .renderHeight = renderHeight,
     };
 
-    renderer_ = std::make_unique<RaylibRenderer>(context);
+    renderer_ = std::make_unique<RaylibRenderer>(context, textureManager_);
 
     AudioPlayer::Init(soundManager_, musicManager_);
 }

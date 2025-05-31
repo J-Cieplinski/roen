@@ -35,6 +35,7 @@ public:
     void loadAsset(std::string_view id, const std::filesystem::path& path) override;
     void freeAssets() override;
     const AssetType& getAsset(std::string_view id) const;
+    const AssetType& getAsset(std::uint64_t id) const;
 
 private:
     std::unordered_map<std::uint64_t, AssetType> assets_;
@@ -105,6 +106,21 @@ const AssetType& AssetManager<AssetType>::getAsset(std::string_view id) const
     try
     {
         return assets_.at(hashedID);
+    }
+    catch (std::out_of_range&)
+    {
+        SDK_WARN("{0} id: \"{1}\" does not exist",
+                 getDemangledName(std::type_index(typeid(AssetType)).name()), id);
+        return assets_.at(interfaces::DefaultAssetID);
+    }
+}
+
+template <DerivedFromIAsset AssetType>
+const AssetType& AssetManager<AssetType>::getAsset(std::uint64_t id) const
+{
+    try
+    {
+        return assets_.at(id);
     }
     catch (std::out_of_range&)
     {

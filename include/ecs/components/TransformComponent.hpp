@@ -8,13 +8,29 @@ namespace roen::ecs::components
 
 struct TransformComponent
 {
-    operator math::Vector2&() { return transform; }
+    bool operator==(const TransformComponent& other) const
+    {
+        return position == other.position and scale == other.scale and rotation == other.rotation
+               and zLayer == other.zLayer;
+    }
 
-    operator const math::Vector2() const { return transform; }
+    math::Vector2 position{0, 0};
+    math::Vector2 scale{1, 1};
+    float rotation{0};
+    std::uint8_t zLayer{0};
 
-    bool operator==(const TransformComponent& other) const { return transform == other.transform; }
+    math::Matrix2D worldTransform;
 
-    math::Vector2 transform;
+    void updateWorldTransform()
+    {
+        const auto rotationInRadians = rotation * math::TO_RADIANS;
+        worldTransform.compose(position, rotationInRadians, scale);
+    }
+
+    void applyParent(const math::Matrix2D& parentMatrix)
+    {
+        worldTransform.applyParent(parentMatrix);
+    }
 };
 
 }  // namespace roen::ecs::components
