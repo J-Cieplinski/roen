@@ -102,6 +102,7 @@ SoundAsset SoundAsset::LoadFallbackAsset()
     const auto wave = LoadWaveFromMemory(".wav", asset::placeholders::DEFAULT_SOUND,
                                          sizeof(asset::placeholders::DEFAULT_SOUND));
     asset.asset_ = LoadSoundFromWave(wave);
+    UnloadWave(wave);
     if (not IsSoundValid(asset))
     {
         throw std::runtime_error("Failed to load default sound");
@@ -140,10 +141,9 @@ void MusicAsset::freeAsset()
 
     if (IsMusicValid(asset_))
     {
-        if (IsMusicStreamPlaying(asset_))
-        {
-            StopMusicStream(asset_);
-        }
+        StopMusicStream(asset_);
+        // There is some kind of bug in UnloadMusicStream underlying calls that cause 400 bytes
+        // leak
         UnloadMusicStream(asset_);
     }
 }
