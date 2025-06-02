@@ -12,6 +12,11 @@ Scene::Scene(manager::GameSceneManager& gameSceneManager, Application* applicati
     lua::LuaManager::Instance().onInit(this);
 }
 
+Scene::~Scene()
+{
+    lua::LuaManager::Instance().onShutdown();
+}
+
 ecs::EntityManager& Scene::getEntityManager()
 {
     return entityManager_;

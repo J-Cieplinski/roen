@@ -28,6 +28,7 @@ public:
     ~LuaManager();
 
     void onInit(interfaces::Scene* scene);
+    void onShutdown();
 
     template <typename... Args>
     void registerUpdateable(std::string_view className, std::string_view fnName,

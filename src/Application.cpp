@@ -38,6 +38,10 @@ Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
 Application::~Application()
 {
     gameSceneManager_.shutdown();
+    textureManager_.reset();
+    soundManager_.reset();
+    musicManager_.reset();
+    fontManager_.reset();
     CloseAudioDevice();
     CloseWindow();
 }

@@ -31,6 +31,7 @@ public:
     void registerAsGlobal(sol::state& luaState, std::string_view name);
 
 private:
+    friend class LuaManager;
     sol::table self_;
     sol::function function_;
 };

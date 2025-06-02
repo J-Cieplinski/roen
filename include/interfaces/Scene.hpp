@@ -24,7 +24,7 @@ class Scene
 public:
     explicit Scene(manager::GameSceneManager& gameSceneManager, Application* application);
 
-    virtual ~Scene() = default;
+    virtual ~Scene();
 
     ecs::EntityManager& getEntityManager();
     Application* getApplication() const;

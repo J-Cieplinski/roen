@@ -48,7 +48,6 @@ namespace roen::lua
 
 LuaManager::~LuaManager()
 {
-    instance_.reset();
 }
 
 LuaManager& LuaManager::Instance()
@@ -77,6 +76,15 @@ void LuaManager::onInit(interfaces::Scene* scene)
     InitMathTypes();
     InitLuaEventHandler();
     InitUtils();
+}
+
+void LuaManager::onShutdown()
+{
+    luaEventManager_.self_.clear();
+    updateables_.clear();
+    lua_.collect_gc();
+    lua_ = sol::state();
+    instance_ = nullptr;
 }
 
 void LuaManager::InitLua()

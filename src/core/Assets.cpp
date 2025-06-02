@@ -136,7 +136,7 @@ MusicAsset MusicAsset::LoadFallbackAsset()
 
 void MusicAsset::freeAsset()
 {
-    SDK_INFO("Unloading sound: {0}", assetPath_.c_str());
+    SDK_INFO("Unloading music: {0}", assetPath_.c_str());
 
     if (IsMusicValid(asset_))
     {
