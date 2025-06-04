@@ -5,7 +5,12 @@
 namespace roen::ecs
 {
 
-Entity::Entity(entt::entity entity, entt::registry& registry)
+Entity::Entity()
+    : Entity(entt::null, nullptr)
+{
+}
+
+Entity::Entity(entt::entity entity, entt::registry* registry)
     : entity_{entity}
     , registry_{registry}
 {
@@ -40,11 +45,11 @@ bool Entity::operator==(const Entity& other) const
 
 void Entity::updateHierarchy(const Entity parent, const Entity child) const
 {
-    auto& parentHierarchy = registry_.get_or_emplace<Hierarchy>(parent);
+    auto& parentHierarchy = registry_->get_or_emplace<Hierarchy>(parent);
     parentHierarchy.children.insert(child);
 
-    auto& childHierarchy = registry_.get_or_emplace<Hierarchy>(child);
-    if (auto maybeChildParentHierarchy = registry_.try_get<Hierarchy>(childHierarchy.parent))
+    auto& childHierarchy = registry_->get_or_emplace<Hierarchy>(child);
+    if (auto maybeChildParentHierarchy = registry_->try_get<Hierarchy>(childHierarchy.parent))
     {
         maybeChildParentHierarchy->children.erase(child);
     }

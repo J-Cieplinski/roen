@@ -26,8 +26,6 @@
 
 #include <Utils.hpp>
 
-#include "core/AudioPlayer.hpp"
-
 namespace roen::lua
 {
 #define STR(str) #str
@@ -48,6 +46,11 @@ namespace roen::lua
 
 LuaManager::~LuaManager()
 {
+}
+
+sol::state_view LuaManager::getState() const
+{
+    return lua_;
 }
 
 LuaManager& LuaManager::Instance()
@@ -80,7 +83,7 @@ void LuaManager::onInit(interfaces::Scene* scene)
 
 void LuaManager::onShutdown()
 {
-    luaEventManager_.self_.clear();
+    luaEventManager_.clear();
     updateables_.clear();
     lua_.collect_gc();
     lua_ = sol::state();
@@ -91,6 +94,40 @@ void LuaManager::InitLua()
 {
     instance_->lua_.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math,
                                    sol::lib::table, sol::lib::os, sol::lib::string);
+
+    std::string lua_paths;
+
+    for (const auto& entry : fs::recursive_directory_iterator("assets/scripts"))
+    {
+        if (entry.is_directory())
+        {
+            std::string path = entry.path().string();
+            // Convert backslashes to slashes for Lua compatibility (on Windows)
+            std::ranges::replace(path, '\\', '/');
+            lua_paths += path + "/?.lua;";
+        }
+    }
+
+    // Append to package.path in Lua
+    std::string current_paths = instance_->lua_["package"]["path"];
+    instance_->lua_["package"]["path"] = lua_paths + current_paths;
+
+    auto script = instance_->lua_.new_usertype<LuaScript>(
+        "LuaScript", sol::constructors<LuaScript(ecs::Entity*)>());
+
+    script["loadScript"] = &LuaScript::loadScript;
+    script["getEntity"] = &LuaScript::getEntity;
+
+    auto entity_type = instance_->lua_["Entity"].get_or_create<sol::usertype<ecs::Entity>>();
+    entity_type.set_function(CONCAT(remove, LuaScript), &ecs::Entity::removeComponent<LuaScript>);
+    entity_type.set_function(CONCAT(get, LuaScript), [](ecs::Entity& self) -> LuaScript&
+                             { return std::ref(self.getComponent<LuaScript>()); });
+    entity_type.set_function(CONCAT(add, LuaScript), &ecs::Entity::addComponent<LuaScript>);
+    entity_type.set_function(
+        CONCAT(add, LuaScript),
+        sol::overload([](ecs::Entity& self, ecs::Entity* entity = nullptr)
+                      { return std::ref(self.addComponent<LuaScript>(entity)); }));
+    entity_type.set_function(CONCAT(has, LuaScript), &ecs::Entity::hasComponent<LuaScript>);
 }
 
 void LuaManager::InitLuaApplication()
@@ -343,10 +380,10 @@ void LuaManager::InitMathTypes()
 
 void LuaManager::InitLuaEventHandler()
 {
-    instance_->luaEventManager_
-        = LuaCallable(instance_->lua_, "EventHandler", "handleEvents", scripts::EventHandlerScript);
-
-    instance_->luaEventManager_.registerAsGlobal(instance_->lua_, "gEventHandler");
+    instance_->lua_.script(scripts::EventHandlerScript);
+    auto eventHandlerClass = instance_->lua_["EventHandler"];
+    instance_->luaEventManager_ = eventHandlerClass["create"](eventHandlerClass);
+    instance_->lua_["gEventHandler"] = instance_->luaEventManager_;
 }
 
 void LuaManager::InitECS()
@@ -354,8 +391,7 @@ void LuaManager::InitECS()
     auto entityManager = instance_->lua_.new_usertype<ecs::EntityManager>("EntityManager");
     entityManager.set_function("createEntity", &ecs::EntityManager::createEntity);
 
-    auto entity = instance_->lua_.new_usertype<ecs::Entity>(
-        "Entity", sol::constructors<sol::types<entt::entity, entt::registry&>>());
+    auto entity = instance_->lua_.new_usertype<ecs::Entity>("Entity");
 
     entity.set_function("addChild", &ecs::Entity::addChild);
     entity.set_function("setParent", &ecs::Entity::setParent);
@@ -377,7 +413,9 @@ void LuaManager::InitECS()
 
     auto transformComponent = instance_->lua_.new_usertype<ecs::components::TransformComponent>(
         "TransformComponent",
-        sol::constructors<sol::types<math::Vector2, math::Vector2, float, std::uint8_t>>());
+        sol::constructors<ecs::components::TransformComponent(),
+                          ecs::components::TransformComponent(math::Vector2, math::Vector2, float,
+                                                              std::uint8_t)>());
 
     transformComponent["transform"] = &ecs::components::TransformComponent::position;
     transformComponent["scale"] = &ecs::components::TransformComponent::scale;
@@ -385,8 +423,8 @@ void LuaManager::InitECS()
     transformComponent["zLayer"] = &ecs::components::TransformComponent::zLayer;
 
     REGISTER_COMPONENT_WITH_ECS(
-        instance_->lua_, TransformComponent, [](ecs::Entity& self, const math::Vector2& vec)
-        { return std::ref(self.addComponent<ecs::components::TransformComponent>(vec)); });
+        instance_->lua_, TransformComponent, [](ecs::Entity& self)
+        { return std::ref(self.addComponent<ecs::components::TransformComponent>()); });
 
     auto factionComponent = instance_->lua_.new_usertype<ecs::components::FactionComponent>(
         "FactionComponent", sol::constructors<sol::types<std::bitset<8>>>());
@@ -467,6 +505,12 @@ void LuaManager::update()
     for (auto& update : updateables_)
     {
         update();
+    }
+
+    auto scripts = scene_->getEntityManager().getRegistry().group<LuaScript>();
+    for (const auto& [entity, script] : scripts.each())
+    {
+        script.onUpdate(1.f);
     }
 }
 

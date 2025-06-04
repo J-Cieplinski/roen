@@ -25,14 +25,19 @@ void AudioPlayer::StopSound(std::string_view asset)
 void AudioPlayer::PlayMusic(std::string_view asset)
 {
     SDK_INFO("Playing music \"{0}\"", asset);
-    PlayMusicStream(musicAssetManager_->getAsset(asset));
+    auto music = musicAssetManager_->getAsset(asset);
+    if (not IsMusicValid(music))
+    {
+        SDK_WARN("Music \"{0}\" is not valid", asset);
+    }
+    PlayMusicStream(music);
     activeMusic = asset;
     musicPlaying_ = true;
 }
 
 void AudioPlayer::StopMusic(std::string_view asset)
 {
-    if (activeMusic == "")
+    if (activeMusic.empty())
     {
         return;
     }
@@ -45,7 +50,7 @@ void AudioPlayer::StopMusic(std::string_view asset)
 
 void AudioPlayer::PauseMusic()
 {
-    if (activeMusic == "" or not musicPlaying_)
+    if (activeMusic.empty() or not musicPlaying_)
     {
         return;
     }
@@ -57,7 +62,7 @@ void AudioPlayer::PauseMusic()
 
 void AudioPlayer::ResumeMusic()
 {
-    if (activeMusic != "" and musicPlaying_)
+    if (!activeMusic.empty() and musicPlaying_)
     {
         return;
     }
@@ -68,7 +73,7 @@ void AudioPlayer::ResumeMusic()
 
 void AudioPlayer::UpdateMusicStream()
 {
-    if (activeMusic != "")
+    if (!activeMusic.empty())
     {
         ::UpdateMusicStream(musicAssetManager_->getAsset(activeMusic));
     }

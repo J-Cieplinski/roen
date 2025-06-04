@@ -3,6 +3,7 @@
 
 #include <data_structure/SystemsContainer.hpp>
 #include <ecs/EntityManager.hpp>
+#include <events/EventHandler.hpp>
 #include <events/EventQueue.hpp>
 
 namespace roen
@@ -31,7 +32,7 @@ public:
     events::EventQueue& getEventQueue();
     virtual void onInit() = 0;
     virtual void handleInput() = 0;
-    virtual void update() = 0;
+    virtual void update();
     virtual void obscured() = 0;
     virtual void revealed() = 0;
     virtual void quit() = 0;
@@ -42,6 +43,7 @@ protected:
     ecs::EntityManager entityManager_;
     data_structure::SystemsContainer systems_;
     events::EventQueue queue_;
+    events::EventHandler handler_;
 };
 
 }  // namespace roen::interfaces

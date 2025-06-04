@@ -32,4 +32,12 @@ events::EventQueue& Scene::getEventQueue()
     return queue_;
 }
 
+void Scene::update()
+{
+    auto events = queue_.getEvents();
+    handler_.handleEvents(events);
+    lua::LuaManager::Instance().callEventHandler(events);
+    lua::LuaManager::Instance().update();
+}
+
 }  // namespace roen::interfaces

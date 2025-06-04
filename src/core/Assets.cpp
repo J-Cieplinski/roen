@@ -124,13 +124,14 @@ bool MusicAsset::loadAsset(const std::filesystem::path& path)
 MusicAsset MusicAsset::LoadFallbackAsset()
 {
     MusicAsset asset;
-    asset.assetPath_ = interfaces::DefaultAssetName;
-    asset.asset_ = LoadMusicStreamFromMemory(".wav", asset::placeholders::DEFAULT_SOUND,
-                                             sizeof(asset::placeholders::DEFAULT_SOUND));
-    if (not IsMusicValid(asset))
-    {
-        throw std::runtime_error("Failed to load default music");
-    }
+    // asset.assetPath_ = interfaces::DefaultAssetName;
+    // asset.asset_ = LoadMusicStreamFromMemory(".wav", asset::placeholders::DEFAULT_SOUND,
+    // sizeof(asset::placeholders::DEFAULT_SOUND));
+    SDK_WARN("There is no default music asset");
+    // if (not IsMusicValid(asset))
+    //{
+    //     throw std::runtime_error("Failed to load default music");
+    // }
 
     return asset;
 }
@@ -143,7 +144,7 @@ void MusicAsset::freeAsset()
     {
         StopMusicStream(asset_);
         // There is some kind of bug in UnloadMusicStream underlying calls that cause 400 bytes
-        // leak
+        // leak if music is loaded from memory
         UnloadMusicStream(asset_);
     }
 }

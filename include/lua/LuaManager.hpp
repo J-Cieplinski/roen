@@ -3,6 +3,8 @@
 
 #include <lua/LuaCallable.hpp>
 
+#include <lua/LuaScript.hpp>
+
 #include <memory>
 
 #include <sol2/sol.hpp>
@@ -26,6 +28,8 @@ public:
     LuaManager(LuaManager&&) = delete;
 
     ~LuaManager();
+
+    sol::state_view getState() const;
 
     void onInit(interfaces::Scene* scene);
     void onShutdown();
@@ -60,8 +64,7 @@ private:
     inline static std::unique_ptr<LuaManager> instance_;
     sol::state lua_;
     std::vector<LuaCallable> updateables_;
-    LuaCallable luaEventManager_;
-    LuaCallable luaGameManager_;
+    sol::table luaEventManager_;
     interfaces::Scene* scene_;
 };
 
@@ -88,12 +91,18 @@ void LuaManager::update(Args&&... args)
     {
         update(std::forward<Args>(args)...);
     }
+
+    auto scripts = scene_->getEntityManager().getRegistry().group<LuaScript>();
+    for (const auto& [entity, script] : scripts.each())
+    {
+        script.onUpdate(1.f);
+    }
 }
 
 template <typename... Args>
 void LuaManager::callEventHandler(Args&&... args)
 {
-    luaEventManager_(std::forward<Args>(args)...);
+    luaEventManager_["handleEvents"](luaEventManager_, std::forward<Args>(args)...);
 }
 
 }  // namespace roen::lua

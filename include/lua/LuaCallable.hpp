@@ -68,7 +68,7 @@ LuaCallable::LuaCallable(sol::state& luaState, std::string_view className, std::
         return;
     }
 
-    constexpr std::string_view constructorName{"create"};
+    constexpr std::string_view constructorName{"new"};
 
     sol::function constructor = classTable[constructorName];
     if (not constructor.valid())
@@ -118,7 +118,7 @@ LuaCallable::LuaCallable(sol::state& luaState, std::string_view className, std::
         return;
     }
 
-    constexpr std::string_view constructorName{"create"};
+    constexpr std::string_view constructorName{"new"};
 
     sol::function constructor = classTable[constructorName];
     if (not constructor.valid())

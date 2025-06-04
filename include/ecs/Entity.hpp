@@ -20,7 +20,8 @@ enum class Error
 class Entity
 {
 public:
-    Entity(entt::entity entity, entt::registry& registry);
+    Entity();
+    Entity(entt::entity entity, entt::registry* registry);
 
     template <typename Component, typename... Args>
     Component& addComponent(Args... args);
@@ -32,7 +33,7 @@ public:
     Component& getComponent();
 
     template <typename Component>
-    void removeComponent();
+    void removeComponent() const;
 
     void addChild(Entity child) const;
     void setParent(Entity parent) const;
@@ -50,7 +51,7 @@ private:
     void updateHierarchy(const Entity parent, const Entity child) const;
 
     entt::entity entity_;
-    entt::registry& registry_;
+    entt::registry* registry_;
 };
 
 }  // namespace roen::ecs
@@ -67,32 +68,32 @@ Component& Entity::addComponent(Args... args)
 {
     SDK_INFO("Adding component: {} to entity: {}",
              getDemangledName(std::type_index(typeid(Component)).name()), entity_);
-    return registry_.emplace<Component>(entity_, std::forward<Args>(args)...);
+    return registry_->emplace<Component>(entity_, std::forward<Args>(args)...);
 }
 
 template <typename Component>
 bool Entity::hasComponent() const
 {
-    auto component = registry_.try_get<Component>(entity_);
+    auto component = registry_->try_get<Component>(entity_);
     return component != nullptr;
 }
 
 template <typename Component>
 Component& Entity::getComponent()
 {
-    return registry_.get<Component>(entity_);
+    return registry_->get<Component>(entity_);
 }
 
 template <typename Component>
-void Entity::removeComponent()
+void Entity::removeComponent() const
 {
-    registry_.remove<Component>(entity_);
+    registry_->remove<Component>(entity_);
 }
 
 template <typename Component>
 std::expected<std::reference_wrapper<Component>, Error> Entity::getComponentMaybe()
 {
-    auto component = registry_.try_get<Component>(entity_);
+    auto component = registry_->try_get<Component>(entity_);
 
     if (component != nullptr)
     {
