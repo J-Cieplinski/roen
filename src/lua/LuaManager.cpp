@@ -1,5 +1,6 @@
 #include <lua/LuaManager.hpp>
 
+#include <lua/LuaScript.hpp>
 #include <lua/scripts/LuaEventHandler.hpp>
 
 #include <Application.hpp>
@@ -83,8 +84,6 @@ void LuaManager::onInit(interfaces::Scene* scene)
 
 void LuaManager::onShutdown()
 {
-    luaEventManager_.clear();
-    updateables_.clear();
     lua_.collect_gc();
     lua_ = sol::state();
     instance_ = nullptr;
@@ -95,22 +94,30 @@ void LuaManager::InitLua()
     instance_->lua_.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math,
                                    sol::lib::table, sol::lib::os, sol::lib::string);
 
-    std::string lua_paths;
-
-    for (const auto& entry : fs::recursive_directory_iterator("assets/scripts"))
+    constexpr std::string_view scripts_path{"assets/scripts"};
+    if (std::filesystem::exists(scripts_path))
     {
-        if (entry.is_directory())
-        {
-            std::string path = entry.path().string();
-            // Convert backslashes to slashes for Lua compatibility (on Windows)
-            std::ranges::replace(path, '\\', '/');
-            lua_paths += path + "/?.lua;";
-        }
-    }
+        std::string lua_paths;
 
-    // Append to package.path in Lua
-    std::string current_paths = instance_->lua_["package"]["path"];
-    instance_->lua_["package"]["path"] = lua_paths + current_paths;
+        for (const auto& entry : fs::recursive_directory_iterator(scripts_path))
+        {
+            if (entry.is_directory())
+            {
+                std::string path = entry.path().string();
+                // Convert backslashes to slashes for Lua compatibility (on Windows)
+                std::ranges::replace(path, '\\', '/');
+                lua_paths += path + "/?.lua;";
+            }
+        }
+
+        // Append to package.path in Lua
+        std::string current_paths = instance_->lua_["package"]["path"];
+        instance_->lua_["package"]["path"] = lua_paths + current_paths;
+    }
+    else
+    {
+        SDK_WARN("Script path \'assets/scripts\' not found");
+    }
 
     auto script = instance_->lua_.new_usertype<LuaScript>(
         "LuaScript", sol::constructors<LuaScript(ecs::Entity*)>());
@@ -502,11 +509,6 @@ void LuaManager::InitEventTypes()
 
 void LuaManager::update()
 {
-    for (auto& update : updateables_)
-    {
-        update();
-    }
-
     auto scripts = scene_->getEntityManager().getRegistry().group<LuaScript>();
     for (const auto& [entity, script] : scripts.each())
     {

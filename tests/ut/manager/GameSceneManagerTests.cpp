@@ -18,7 +18,6 @@ public:
 
     MOCK_METHOD(void, onInit, (), (override));
     MOCK_METHOD(void, handleInput, (), (override));
-    MOCK_METHOD(void, render, (), (override));
     MOCK_METHOD(void, update, (), (override));
     MOCK_METHOD(void, obscured, (), (override));
     MOCK_METHOD(void, revealed, (), (override));
