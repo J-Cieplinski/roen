@@ -34,7 +34,7 @@ namespace roen::lua
 
 #define REGISTER_COMPONENT_WITH_ECS(curLuaState, Comp, ...)                                       \
     {                                                                                             \
-        namespace component = ecs::components;                                                    \
+        namespace component = ecs;                                                                \
         auto entity_type = curLuaState["Entity"].get_or_create<sol::usertype<ecs::Entity>>();     \
         entity_type.set_function(CONCAT(remove, Comp),                                            \
                                  &ecs::Entity::removeComponent<component::Comp>);                 \
@@ -84,9 +84,10 @@ void LuaManager::onInit(interfaces::Scene* scene)
 
 void LuaManager::onShutdown()
 {
+    luaEventManager_ = sol::nil;
+    scene_ = nullptr;
     lua_.collect_gc();
     lua_ = sol::state();
-    instance_ = nullptr;
 }
 
 void LuaManager::InitLua()
@@ -120,21 +121,10 @@ void LuaManager::InitLua()
     }
 
     auto script = instance_->lua_.new_usertype<LuaScript>(
-        "LuaScript", sol::constructors<LuaScript(ecs::Entity*)>());
+        "LuaScript", sol::constructors<LuaScript(ecs::Entity)>());
 
     script["loadScript"] = &LuaScript::loadScript;
     script["getEntity"] = &LuaScript::getEntity;
-
-    auto entity_type = instance_->lua_["Entity"].get_or_create<sol::usertype<ecs::Entity>>();
-    entity_type.set_function(CONCAT(remove, LuaScript), &ecs::Entity::removeComponent<LuaScript>);
-    entity_type.set_function(CONCAT(get, LuaScript), [](ecs::Entity& self) -> LuaScript&
-                             { return std::ref(self.getComponent<LuaScript>()); });
-    entity_type.set_function(CONCAT(add, LuaScript), &ecs::Entity::addComponent<LuaScript>);
-    entity_type.set_function(
-        CONCAT(add, LuaScript),
-        sol::overload([](ecs::Entity& self, ecs::Entity* entity = nullptr)
-                      { return std::ref(self.addComponent<LuaScript>(entity)); }));
-    entity_type.set_function(CONCAT(has, LuaScript), &ecs::Entity::hasComponent<LuaScript>);
 }
 
 void LuaManager::InitLuaApplication()
@@ -403,44 +393,51 @@ void LuaManager::InitECS()
     entity.set_function("addChild", &ecs::Entity::addChild);
     entity.set_function("setParent", &ecs::Entity::setParent);
 
-    auto graphicsComponent = instance_->lua_.new_usertype<ecs::components::GraphicsComponent>(
+    auto graphicsComponent = instance_->lua_.new_usertype<ecs::GraphicsComponent>(
         "GraphicsComponent",
         sol::constructors<sol::types<std::string_view, math::Rectangle>,
                           sol::types<std::string_view, math::Rectangle, std::uint8_t>>());
 
-    graphicsComponent["srcRectangle"] = &ecs::components::GraphicsComponent::srcRectangle;
-    graphicsComponent["guid"] = &ecs::components::GraphicsComponent::guid;
+    graphicsComponent["srcRectangle"] = &ecs::GraphicsComponent::srcRectangle;
+    graphicsComponent["guid"] = &ecs::GraphicsComponent::guid;
 
     REGISTER_COMPONENT_WITH_ECS(
         instance_->lua_, GraphicsComponent,
         [](ecs::Entity& self, const std::string& str, const math::Rectangle& rect)
-        { return std::ref(self.addComponent<ecs::components::GraphicsComponent>(str, rect)); },
+        { return std::ref(self.addComponent<ecs::GraphicsComponent>(str, rect)); },
         [](ecs::Entity& self, const std::string& str, const math::Rectangle& rect)
-        { return std::ref(self.addComponent<ecs::components::GraphicsComponent>(str, rect)); });
+        { return std::ref(self.addComponent<ecs::GraphicsComponent>(str, rect)); });
 
-    auto transformComponent = instance_->lua_.new_usertype<ecs::components::TransformComponent>(
+    auto transformComponent = instance_->lua_.new_usertype<ecs::TransformComponent>(
         "TransformComponent",
-        sol::constructors<ecs::components::TransformComponent(),
-                          ecs::components::TransformComponent(math::Vector2, math::Vector2, float,
-                                                              std::uint8_t)>());
+        sol::constructors<ecs::TransformComponent(),
+                          ecs::TransformComponent(math::Vector2, math::Vector2, float,
+                                                  std::uint8_t)>());
 
-    transformComponent["transform"] = &ecs::components::TransformComponent::position;
-    transformComponent["scale"] = &ecs::components::TransformComponent::scale;
-    transformComponent["rotation"] = &ecs::components::TransformComponent::rotation;
-    transformComponent["zLayer"] = &ecs::components::TransformComponent::zLayer;
+    transformComponent["transform"] = &ecs::TransformComponent::position;
+    transformComponent["scale"] = &ecs::TransformComponent::scale;
+    transformComponent["rotation"] = &ecs::TransformComponent::rotation;
+    transformComponent["zLayer"] = &ecs::TransformComponent::zLayer;
 
-    REGISTER_COMPONENT_WITH_ECS(
-        instance_->lua_, TransformComponent, [](ecs::Entity& self)
-        { return std::ref(self.addComponent<ecs::components::TransformComponent>()); });
+    REGISTER_COMPONENT_WITH_ECS(instance_->lua_, TransformComponent, [](ecs::Entity& self)
+                                { return std::ref(self.addComponent<ecs::TransformComponent>()); });
 
-    auto factionComponent = instance_->lua_.new_usertype<ecs::components::FactionComponent>(
+    auto factionComponent = instance_->lua_.new_usertype<ecs::FactionComponent>(
         "FactionComponent", sol::constructors<sol::types<std::bitset<8>>>());
 
-    factionComponent["factionMask"] = &ecs::components::FactionComponent::factionMask;
+    factionComponent["factionMask"] = &ecs::FactionComponent::factionMask;
 
     REGISTER_COMPONENT_WITH_ECS(
         instance_->lua_, FactionComponent, [](ecs::Entity& self, const std::uint8_t& mask)
-        { return std::ref(self.addComponent<ecs::components::FactionComponent>(mask)); });
+        { return std::ref(self.addComponent<ecs::FactionComponent>(mask)); });
+
+    auto entity_type = instance_->lua_["Entity"].get_or_create<sol::usertype<ecs::Entity>>();
+    entity_type.set_function("addLuaScript", [](ecs::Entity& self) -> LuaScript&
+                             { return std::ref(self.addComponent<LuaScript>(self)); });
+    entity_type.set_function("getLuaScript", [](ecs::Entity& self) -> LuaScript&
+                             { return std::ref(self.getComponent<LuaScript>()); });
+    entity_type.set_function("removeLuaScript", &ecs::Entity::removeComponent<LuaScript>);
+    entity_type.set_function("hasLuaScript", &ecs::Entity::hasComponent<LuaScript>);
 }
 
 template <typename EventType, typename... Args>
@@ -509,6 +506,11 @@ void LuaManager::InitEventTypes()
 
 void LuaManager::update()
 {
+    if (not scene_)
+    {
+        return;
+    }
+
     auto scripts = scene_->getEntityManager().getRegistry().group<LuaScript>();
     for (const auto& [entity, script] : scripts.each())
     {

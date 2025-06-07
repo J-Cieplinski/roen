@@ -12,7 +12,7 @@ std::vector<std::shared_ptr<Event>> EventQueue::getEvents()
 {
     std::vector<std::shared_ptr<Event>> eventsTmp;
     std::swap(events_, eventsTmp);
-    return std::move(eventsTmp);
+    return eventsTmp;
 }
 
 }  // namespace roen::events

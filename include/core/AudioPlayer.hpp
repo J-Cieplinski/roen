@@ -1,7 +1,7 @@
 #ifndef ROEN_CORE_SOUND_PLAYER_HPP
 #define ROEN_CORE_SOUND_PLAYER_HPP
 
-#include <core/AssetManager.hpp>
+#include <interfaces/IAudioPlayer.hpp>
 
 #include <string_view>
 
@@ -11,8 +11,7 @@ namespace roen
 class AudioPlayer
 {
 public:
-    static void Init(std::shared_ptr<SoundManager> soundAssetManager,
-                     std::shared_ptr<MusicManager> musicAssetManager);
+    static void Init(std::unique_ptr<interfaces::IAudioPlayer> impl);
 
     static void PlaySound(std::string_view asset);
     static void StopSound(std::string_view asset);
@@ -24,9 +23,7 @@ public:
     static void UpdateMusicStream();
 
 private:
-    inline static std::shared_ptr<SoundManager> soundAssetManager_;
-    inline static std::shared_ptr<MusicManager> musicAssetManager_;
-    inline static bool musicPlaying_{false};
+    inline static std::unique_ptr<interfaces::IAudioPlayer> impl_;
 };
 
 }  // namespace roen

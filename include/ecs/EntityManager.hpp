@@ -13,6 +13,9 @@ class EntityManager
 public:
     EntityManager();
     Entity createEntity();
+    Entity getEntity();
+
+    void clear();
 
     operator entt::registry&();
 

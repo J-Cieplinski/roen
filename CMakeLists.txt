@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.29)
-
 project(roen)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -16,20 +14,32 @@ set(RAYLIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/raylib/src)
 set(LUA_INCLUDE_DIR ${DEPENDENCIES_DIR}/sol2)
 set(DEPENDENCIES_INCLUDE_DIR ${DEPENDENCIES_DIR} ${ENTT_DIR} ${RAYLIB_DIR} ${SPDLOG_DIR})
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-#To enable/disable spdlog logging
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC IS_DEBUG)
-    if(UNIX)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -fsanitize=undefined -fsanitize=address")
-        target_link_options(${PROJECT_NAME} BEFORE PUBLIC -fsanitize=undefined PUBLIC -fsanitize=address)
-    endif (UNIX)
-    add_subdirectory(tests)
-endif ()
+#Compile definition to init library with raylib backend, hardcoded for now
+target_compile_definitions(${PROJECT_NAME}
+    PUBLIC
+        RAYLIB_BACKEND
+        $<$<CONFIG:Debug>:IS_DEBUG=1>
+        $<$<AND:$<CONFIG:Debug>,$<C_COMPILER_ID:GNU>>:USE_WAYLAND=ON>
+)
 
-if(UNIX)
-    add_compile_definitions(-DUSE_WAYLAND=ON)
-endif (UNIX)
+set(DEBUG_GNU_CONDITION $<AND:$<CONFIG:Debug>,$<C_COMPILER_ID:GNU>>)
+
+# Compiler options for debug builds with GCC
+target_compile_options(${PROJECT_NAME} PUBLIC
+    $<${DEBUG_GNU_CONDITION}:-Werror>
+    $<${DEBUG_GNU_CONDITION}:-fsanitize=undefined>
+    $<${DEBUG_GNU_CONDITION}:-fsanitize=address>
+)
+
+# Link options for sanitizers (required when using sanitizer flags)
+target_link_options(${PROJECT_NAME} PUBLIC
+    $<${DEBUG_GNU_CONDITION}:-fsanitize=undefined>
+    $<${DEBUG_GNU_CONDITION}:-fsanitize=address>
+)
+
+add_subdirectory(tests)
 
 target_sources(${PROJECT_NAME}
     PUBLIC

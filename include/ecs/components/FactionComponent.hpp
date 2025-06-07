@@ -1,10 +1,10 @@
-#ifndef ROEN_ECS_COMPONENTS_FACTION_COMPONENT_HPP
-#define ROEN_ECS_COMPONENTS_FACTION_COMPONENT_HPP
+#ifndef ROEN_ECS_FACTION_COMPONENT_HPP
+#define ROEN_ECS_FACTION_COMPONENT_HPP
 
 #include <bitset>
 #include <cstdint>
 
-namespace roen::ecs::components
+namespace roen::ecs
 {
 
 enum Faction : std::uint64_t
@@ -17,24 +17,15 @@ enum Faction : std::uint64_t
 
 struct FactionComponent
 {
-    operator std::bitset<8>&()
-    {
-        return factionMask;
-    }
+    operator std::bitset<8>&() { return factionMask; }
 
-    operator const std::bitset<8>() const
-    {
-        return factionMask;
-    }
+    operator const std::bitset<8>() const { return factionMask; }
 
-    bool operator==(const FactionComponent& other)
-    {
-        return factionMask == other.factionMask;
-    }
+    bool operator==(const FactionComponent& other) { return factionMask == other.factionMask; }
 
     std::bitset<8> factionMask;
 };
 
-}  // namespace roen::ecs::components
+}  // namespace roen::ecs
 
-#endif  // ROEN_ECS_COMPONENTS_FACTION_COMPONENT_HPP
+#endif  // ROEN_ECS_FACTION_COMPONENT_HPP

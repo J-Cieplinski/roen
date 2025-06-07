@@ -2,12 +2,25 @@
 #define ROEN_ROENPCH_HPP
 
 #include <algorithm>
+#include <bitset>
+#include <cmath>
+#include <cstdint>
+#include <expected>
+#include <filesystem>
 #include <functional>
+#include <map>
 #include <memory>
 #include <ranges>
+#include <set>
+#include <stdexcept>
 #include <string>
+#include <string_view>
+#include <typeindex>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
+#include <box2d/base.h>
 #include <raylib.h>
 #include <raymath.h>
 #include <spdlog/spdlog.h>
@@ -18,18 +31,48 @@
 #include <Utils.hpp>
 
 #include <algorithms/search/Pathfinding.hpp>
+
 #include <core/AssetManager.hpp>
+#include <core/Assets.hpp>
+#include <core/AudioPlayer.hpp>
+#include <core/DefaultAsset.hpp>
+#include <core/Input.hpp>
+#include <core/KeyCodes.hpp>
+#include <core/SceneGraph.hpp>
+
 #include <data_structure/Graph.hpp>
 #include <data_structure/INode.hpp>
 #include <data_structure/MapNode.hpp>
 #include <data_structure/PriorityQueue.hpp>
 #include <data_structure/SystemsContainer.hpp>
+
+#include <ecs/Entity.hpp>
+#include <ecs/EntityManager.hpp>
+#include <ecs/components/DirtyComponent.hpp>
+#include <ecs/components/FactionComponent.hpp>
+#include <ecs/components/GraphicsComponent.hpp>
+#include <ecs/components/TransformComponent.hpp>
+
+#include <events/Event.hpp>
+#include <events/EventHandler.hpp>
+#include <events/EventQueue.hpp>
+#include <events/KeyEvent.hpp>
+#include <events/MouseEvent.hpp>
+
 #include <interfaces/IAsset.hpp>
+#include <interfaces/IAudioPlayer.hpp>
 #include <interfaces/ISystem.hpp>
+#include <interfaces/Renderer.hpp>
 #include <interfaces/Scene.hpp>
+
 #include <loader/BaseMapLoader.hpp>
+
 #include <log/Logger.hpp>
 #include <log/formatters/entity.hpp>
+
 #include <manager/GameSceneManager.hpp>
+
+#include <math/Types.hpp>
+#include <math/decorators/RaylibDecorators.hpp>
 
 #endif  // ROEN_ROENPCH_HPP

@@ -5,27 +5,28 @@
 namespace roen::lua
 {
 
-LuaScript::LuaScript(ecs::Entity* entity)
-    : entity_{entity}
+LuaScript::LuaScript(ecs::Entity entity)
+    : entity_{std::move(entity)}
 {
 }
 
-void LuaScript::loadScript(const std::filesystem::path& filename)
+void LuaScript::loadScript(std::string filename)
 {
-    if (not std::filesystem::exists(filename))
+    std::filesystem::path const file{std::move(filename)};
+    if (not std::filesystem::exists(file))
     {
-        SDK_ERROR("Failed to find script file {0}", filename.string().c_str());
+        SDK_ERROR("Failed to find script file {0}", file.string().c_str());
         return;
     }
 
     auto state = LuaManager::Instance().getState();
 
     env_ = sol::environment(state, sol::create, state.globals());
-    auto loadScriptRes = state.script_file(filename, env_, sol::script_pass_on_error);
+    auto loadScriptRes = state.script_file(file, env_, sol::script_pass_on_error);
     if (not loadScriptRes.valid())
     {
         const sol::error err = loadScriptRes;
-        SDK_ERROR("Failed to load script {0}", filename.string().c_str());
+        SDK_ERROR("Failed to load script {0}", file.string().c_str());
         SDK_ERROR("Error: {0}", err.what());
         return;
     }
@@ -40,7 +41,7 @@ void LuaScript::loadScript(const std::filesystem::path& filename)
     if (not result.valid())
     {
         const sol::error err = result;
-        SDK_ERROR("Failed to execute onInit on script {0}", filename.string().c_str());
+        SDK_ERROR("Failed to execute onInit on script {0}", file.string().c_str());
         SDK_ERROR("Error: {0}", err.what());
         return;
     }
@@ -60,13 +61,13 @@ void LuaScript::onUpdate(float dt) const
         if (not result.valid())
         {
             const sol::error err = result;
-            SDK_ERROR("Failed to execute onInit");
+            SDK_ERROR("Failed to execute onUpdate");
             SDK_ERROR("Error: {0}", err.what());
         }
     }
 }
 
-ecs::Entity* LuaScript::getEntity() const
+ecs::Entity LuaScript::getEntity() const
 {
     return entity_;
 }

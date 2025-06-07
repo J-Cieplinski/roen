@@ -17,9 +17,7 @@ public:
 
 inline auto formatter<entt::entity>::format(entt::entity entity, format_context& ctx) const
 {
-    string_view enttStr{std::to_string(static_cast<std::uint32_t>(entity))};
-
-    return formatter<string_view>::format(enttStr, ctx);
+    return fmt::format_to(ctx.out(), "{}", static_cast<std::uint32_t>(entity));
 }
 
 }  // namespace fmt

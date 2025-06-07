@@ -5,8 +5,6 @@
 
 #include <core/KeyCodes.hpp>
 
-#include <cstdint>
-
 namespace roen::events
 {
 

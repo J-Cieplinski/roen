@@ -1,9 +1,9 @@
-#ifndef ROEN_ECS_COMPONENTS_TRANSFORM_COMPONENT_HPP
-#define ROEN_ECS_COMPONENTS_TRANSFORM_COMPONENT_HPP
+#ifndef ROEN_ECS_TRANSFORM_COMPONENT_HPP
+#define ROEN_ECS_TRANSFORM_COMPONENT_HPP
 
 #include <math/Types.hpp>
 
-namespace roen::ecs::components
+namespace roen::ecs
 {
 
 struct TransformComponent
@@ -33,6 +33,6 @@ struct TransformComponent
     }
 };
 
-}  // namespace roen::ecs::components
+}  // namespace roen::ecs
 
-#endif  // ROEN_ECS_COMPONENTS_TRANSFORM_COMPONENT_HPP
+#endif  // ROEN_ECS_TRANSFORM_COMPONENT_HPP

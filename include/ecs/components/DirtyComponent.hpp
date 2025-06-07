@@ -1,13 +1,13 @@
-#ifndef ROEN_ECS_COMPONENTS_DIRTY_COMPONENT_HPP
-#define ROEN_ECS_COMPONENTS_DIRTY_COMPONENT_HPP
+#ifndef ROEN_ECS_DIRTY_COMPONENT_HPP
+#define ROEN_ECS_DIRTY_COMPONENT_HPP
 
-namespace roen::ecs::components
+namespace roen::ecs
 {
 
 struct DirtyComponent
 {
 };
 
-}  // namespace roen::ecs::components
+}  // namespace roen::ecs
 
-#endif  // ROEN_ECS_COMPONENTS_DIRTY_COMPONENT_HPP
+#endif  // ROEN_ECS_DIRTY_COMPONENT_HPP

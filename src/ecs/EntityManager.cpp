@@ -12,9 +12,8 @@ namespace roen::ecs
 
 EntityManager::EntityManager()
 {
-    registry_.on_construct<components::TransformComponent>()
-        .connect<[&](entt::registry& reg, entt::entity e)
-                 { reg.emplace<components::DirtyComponent>(e); }>();
+    registry_.on_construct<TransformComponent>()
+        .connect<[&](entt::registry& reg, entt::entity e) { reg.emplace<DirtyComponent>(e); }>();
 }
 
 Entity EntityManager::createEntity()
@@ -23,6 +22,19 @@ Entity EntityManager::createEntity()
     SDK_INFO("Created entity {}", entity);
 
     return entity;
+}
+
+Entity EntityManager::getEntity()
+{
+    Entity entity{registry_.create(), &registry_};
+    SDK_INFO("Returning entity {}", entity);
+
+    return entity;
+}
+
+void EntityManager::clear()
+{
+    registry_.clear();
 }
 
 EntityManager::operator entt::registry&()

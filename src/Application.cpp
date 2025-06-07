@@ -3,7 +3,9 @@
 #include <Application.hpp>
 
 #include <core/AudioPlayer.hpp>
-#include <core/render/RaylibRenderer.hpp>
+
+#include <core/raylib/RaylibAudioPlayer.hpp>
+#include <core/raylib/RaylibRenderer.hpp>
 
 namespace roen
 {
@@ -30,9 +32,14 @@ Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
         .renderHeight = renderHeight,
     };
 
+#ifdef RAYLIB_BACKEND
     renderer_ = std::make_unique<RaylibRenderer>(context, textureManager_);
+    auto audioPlayer = std::make_unique<RaylibAudioPlayer>(soundManager_, musicManager_);
+#else
+    SDK_CRITICAL("No supported backend present");
+#endif
 
-    AudioPlayer::Init(soundManager_, musicManager_);
+    AudioPlayer::Init(std::move(audioPlayer));
 }
 
 Application::~Application()

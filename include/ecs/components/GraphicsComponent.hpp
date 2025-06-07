@@ -1,14 +1,12 @@
-#ifndef ROEN_ECS_COMPONENTS_GRAPHICS_COMPONENT_HPP
-#define ROEN_ECS_COMPONENTS_GRAPHICS_COMPONENT_HPP
-
-#include <Utils.hpp>
+#ifndef ROEN_ECS_GRAPHICS_COMPONENT_HPP
+#define ROEN_ECS_GRAPHICS_COMPONENT_HPP
 
 #include <math/Types.hpp>
 
 #include <cstdint>
 #include <string>
 
-namespace roen::ecs::components
+namespace roen::ecs
 {
 
 struct GraphicsComponent
@@ -44,6 +42,6 @@ struct GraphicsComponent
     std::string guid;
 };
 
-}  // namespace roen::ecs::components
+}  // namespace roen::ecs
 
-#endif  // ROEN_ECS_COMPONENTS_GRAPHICS_COMPONENT_HPP
+#endif  // ROEN_ECS_GRAPHICS_COMPONENT_HPP

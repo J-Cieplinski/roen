@@ -14,6 +14,7 @@ Scene::Scene(manager::GameSceneManager& gameSceneManager, Application* applicati
 
 Scene::~Scene()
 {
+    entityManager_.clear();
     lua::LuaManager::Instance().onShutdown();
 }
 

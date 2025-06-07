@@ -17,18 +17,18 @@ namespace roen::lua
 class LuaScript
 {
 public:
-    LuaScript(ecs::Entity* entity = nullptr);
+    LuaScript(ecs::Entity entity);
 
-    void loadScript(const std::filesystem::path& filename);
+    void loadScript(std::string filename);
     void onUpdate(float dt) const;
-    ecs::Entity* getEntity() const;
+    ecs::Entity getEntity() const;
 
 private:
     std::unique_ptr<sol::protected_function> onUpdate_;
     std::unique_ptr<sol::protected_function> onInit_;
 
     sol::environment env_;
-    ecs::Entity* entity_;
+    ecs::Entity entity_;
 };
 
 }  // namespace roen::lua
