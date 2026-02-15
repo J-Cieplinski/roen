@@ -16,3 +16,6 @@
 [submodule "dependencies/box2d"]
 	path = dependencies/box2d
 	url = git@github.com:erincatto/box2d.git
+[submodule "dependencies/coro"]
+	path = dependencies/coro
+	url = git@github.com:jbaldwin/libcoro.git

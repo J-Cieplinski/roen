@@ -13,7 +13,7 @@ class EntityManager
 public:
     EntityManager();
     Entity createEntity();
-    Entity getEntity();
+    Entity getEntity(entt::entity entt);
 
     void clear();
 

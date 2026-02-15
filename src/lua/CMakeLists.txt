@@ -7,3 +7,5 @@ target_sources(${PROJECT_NAME}
     ${INCLUDE_DIR}/lua/LuaScript.hpp
     ${INCLUDE_DIR}/lua/scripts/LuaEventHandler.hpp
 )
+
+add_subdirectory(experimental)

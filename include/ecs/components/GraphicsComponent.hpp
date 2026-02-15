@@ -18,15 +18,10 @@ struct GraphicsComponent
     }
 
     GraphicsComponent(std::string_view str, math::Rectangle srcRectangle)
-        : GraphicsComponent{str, srcRectangle, 0}
-    {
-        SDK_TRACE("Constructed GraphicsComponent with str: {}", str);
-    }
-
-    GraphicsComponent(std::string_view str, math::Rectangle srcRectangle, std::uint8_t zLayer)
         : srcRectangle{srcRectangle}
         , guid{str}
     {
+        SDK_TRACE("Constructed GraphicsComponent with str: {}", str);
     }
 
     operator math::Rectangle&() { return srcRectangle; }

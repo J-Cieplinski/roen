@@ -7,7 +7,7 @@ namespace roen
 
 namespace
 {
-std::string_view activeMusic;
+std::string activeMusic;
 }
 
 RaylibAudioPlayer::RaylibAudioPlayer(std::shared_ptr<SoundManager> soundAssetManager,

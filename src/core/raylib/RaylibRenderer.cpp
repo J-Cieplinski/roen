@@ -56,7 +56,7 @@ void RaylibRenderer::renderEntities(entt::registry& registry) const
 {
     checkForDirtyAndSort(registry);
 
-    auto group = registry.group<ecs::TransformComponent, ecs::GraphicsComponent>();
+    auto group = registry.view<ecs::TransformComponent, ecs::GraphicsComponent>();
 
     for (auto entity : group)
     {

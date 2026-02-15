@@ -1,0 +1,15 @@
+target_sources(${PROJECT_NAME}
+    PUBLIC
+    ${INCLUDE_DIR}/lua/experimental/CommandApplicator.hpp
+    ${INCLUDE_DIR}/lua/experimental/CommandSystem.hpp
+    ${INCLUDE_DIR}/lua/experimental/LuaApiBindings.hpp
+    ${INCLUDE_DIR}/lua/experimental/LuaManager.hpp
+    ${INCLUDE_DIR}/lua/experimental/LuaScript.hpp
+    ${INCLUDE_DIR}/lua/experimental/LuaWorker.hpp
+    ${INCLUDE_DIR}/lua/experimental/ReadOnlyECS.hpp
+    ${INCLUDE_DIR}/lua/experimental/SnapshotCapture.hpp
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaWorker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript.cpp
+)

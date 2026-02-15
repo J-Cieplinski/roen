@@ -37,6 +37,9 @@ public:
 
     void addChild(Entity child) const;
     void setParent(Entity parent) const;
+    void destroy() const;
+
+    bool valid() const;
 
     template <typename Component>
     [[nodiscard("Error should be handled")]]

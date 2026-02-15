@@ -394,9 +394,7 @@ void LuaManager::InitECS()
     entity.set_function("setParent", &ecs::Entity::setParent);
 
     auto graphicsComponent = instance_->lua_.new_usertype<ecs::GraphicsComponent>(
-        "GraphicsComponent",
-        sol::constructors<sol::types<std::string_view, math::Rectangle>,
-                          sol::types<std::string_view, math::Rectangle, std::uint8_t>>());
+        "GraphicsComponent", sol::constructors<sol::types<std::string_view, math::Rectangle>>());
 
     graphicsComponent["srcRectangle"] = &ecs::GraphicsComponent::srcRectangle;
     graphicsComponent["guid"] = &ecs::GraphicsComponent::guid;

@@ -24,12 +24,9 @@ Entity EntityManager::createEntity()
     return entity;
 }
 
-Entity EntityManager::getEntity()
+Entity EntityManager::getEntity(entt::entity entt)
 {
-    Entity entity{registry_.create(), &registry_};
-    SDK_INFO("Returning entity {}", entity);
-
-    return entity;
+    return {entt, &registry_};
 }
 
 void EntityManager::clear()

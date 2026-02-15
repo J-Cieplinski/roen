@@ -28,9 +28,34 @@ void Entity::setParent(const Entity parent) const
     updateHierarchy(parent, *this);
 }
 
+void Entity::destroy() const
+{
+    auto& hierarchy = registry_->get_or_emplace<Hierarchy>(entity_);
+    if (hierarchy.parent != entt::null)
+    {
+        if (auto parent_hierarchy = registry_->try_get<Hierarchy>(hierarchy.parent))
+        {
+            parent_hierarchy->children.erase(entity_);
+        }
+    }
+
+    for (const auto& child : hierarchy.children)
+    {
+        Entity child_entity{child, registry_};
+        child_entity.destroy();
+    }
+
+    registry_->destroy(entity_);
+}
+
+bool Entity::valid() const
+{
+    return registry_ != nullptr and registry_->valid(entity_);
+}
+
 Entity::operator bool() const
 {
-    return entity_ != entt::null;
+    return entity_ != entt::null and valid();
 }
 
 Entity::operator entt::entity() const

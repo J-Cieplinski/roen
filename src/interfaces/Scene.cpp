@@ -1,6 +1,6 @@
 #include <interfaces/Scene.hpp>
 
-#include <lua/LuaManager.hpp>
+#include <lua/experimental/LuaManager.hpp>
 
 namespace roen::interfaces
 {
@@ -9,13 +9,13 @@ Scene::Scene(manager::GameSceneManager& gameSceneManager, Application* applicati
     : application_{application}
     , gameSceneManager_{gameSceneManager}
 {
-    lua::LuaManager::Instance().onInit(this);
+    lua::experimental::LuaManager::Instance().onInit(this);
 }
 
 Scene::~Scene()
 {
     entityManager_.clear();
-    lua::LuaManager::Instance().onShutdown();
+    lua::experimental::LuaManager::Instance().onShutdown();
 }
 
 ecs::EntityManager& Scene::getEntityManager()
@@ -37,8 +37,7 @@ void Scene::update()
 {
     auto events = queue_.getEvents();
     handler_.handleEvents(events);
-    lua::LuaManager::Instance().callEventHandler(events);
-    lua::LuaManager::Instance().update();
+    lua::experimental::LuaManager::Instance().update(1);
 }
 
 }  // namespace roen::interfaces
