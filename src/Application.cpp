@@ -4,63 +4,62 @@
 
 #include <core/AudioPlayer.hpp>
 
-#include <core/raylib/RaylibAudioPlayer.hpp>
-#include <core/raylib/RaylibRenderer.hpp>
+#include "core/raylib/RaylibPlatform.hpp"
 
 namespace roen
 {
 
-Application::Application(std::uint32_t windowWith, std::uint32_t windowHeight,
-                         std::uint32_t renderWidth, std::uint32_t renderHeight,
-                         std::string_view windowTitle)
-    : isRunning_{true}
+Application::Application(std::uint32_t renderWidth, std::uint32_t renderHeight,
+                         std::unique_ptr<interfaces::IPlatform> platform)
+    : platform_{std::move(platform)}
+    , isRunning_{true}
 {
 #ifdef IS_DEBUG
     log::Logger::Init();
 #endif
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(windowWith, windowHeight, windowTitle.data());
-    InitAudioDevice();
     textureManager_ = std::make_shared<TextureManager>();
     soundManager_ = std::make_shared<SoundManager>();
     musicManager_ = std::make_shared<MusicManager>();
     fontManager_ = std::make_shared<FontManager>();
 
-    RenderContext context{
+    const RenderContext context{
         .renderWidth = renderWidth,
         .renderHeight = renderHeight,
     };
 
-#ifdef RAYLIB_BACKEND
-    renderer_ = std::make_unique<RaylibRenderer>(context, textureManager_);
-    auto audioPlayer = std::make_unique<RaylibAudioPlayer>(soundManager_, musicManager_);
-#else
-    SDK_CRITICAL("No supported backend present");
-#endif
-
-    AudioPlayer::Init(std::move(audioPlayer));
+    platform_->init();
+    renderer_ = platform_->createRenderer(context, textureManager_);
+    AudioPlayer::Init(platform_->createAudioPlayer(soundManager_, musicManager_));
 }
 
 Application::~Application()
 {
     gameSceneManager_.shutdown();
+    AudioPlayer::Shutdown();
     textureManager_.reset();
     soundManager_.reset();
     musicManager_.reset();
     fontManager_.reset();
-    CloseAudioDevice();
-    CloseWindow();
+    renderer_.reset();
+    platform_->shutdown();
 }
 
-void Application::onRender()
+std::set<PlatformType> Application::getAvailablePlatforms()
 {
-    renderer_->onRender(gameSceneManager_.getCurrentScene().getEntityManager());
+    static std::set availablePlatforms{PlatformType::Raylib};
+
+    return availablePlatforms;
 }
 
-void Application::onGuiRender()
+void Application::onRender(interfaces::Scene& scene)
 {
-    renderer_->onRenderGui(gameSceneManager_.getCurrentScene().getEntityManager());
+    renderer_->onRender(scene.getEntityManager());
+}
+
+void Application::onGuiRender(interfaces::Scene& scene)
+{
+    renderer_->onRenderGui(scene.getEntityManager());
 }
 
 void Application::run()
@@ -71,15 +70,15 @@ void Application::run()
     {
         try
         {
-            isRunning_ = !WindowShouldClose();
+            isRunning_ = !platform_->shouldClose();
             gameSceneManager_.update();
             auto& currentScene = gameSceneManager_.getCurrentScene();
             AudioPlayer::UpdateMusicStream();
             currentScene.handleInput();
             currentScene.update();
 
-            onRender();
-            onGuiRender();
+            onRender(currentScene);
+            onGuiRender(currentScene);
         }
         catch (std::exception& e)
         {

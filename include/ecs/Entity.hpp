@@ -71,7 +71,7 @@ Component& Entity::addComponent(Args... args)
 {
     SDK_INFO("Adding component: {} to entity: {}",
              getDemangledName(std::type_index(typeid(Component)).name()), entity_);
-    return registry_->emplace<Component>(entity_, std::forward<Args>(args)...);
+    return registry_->emplace_or_replace<Component>(entity_, std::forward<Args>(args)...);
 }
 
 template <typename Component>

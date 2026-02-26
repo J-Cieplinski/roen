@@ -25,22 +25,26 @@ void TextureAsset::freeAsset()
     }
 }
 
-TextureAsset TextureAsset::LoadFallbackAsset()
+const TextureAsset& TextureAsset::LoadFallbackAsset()
 {
-    TextureAsset asset;
-    asset.assetPath_ = interfaces::DefaultAssetName;
-
-    Image image{.data = asset::placeholders::DEFAULT_TEXTURE_DATA,
-                .width = asset::placeholders::DEFAULT_TEXTURE_WIDTH,
-                .height = asset::placeholders::DEFAULT_TEXTURE_HEIGHT,
-                .mipmaps = 1,
-                .format = asset::placeholders::DEFAULT_TEXTURE_FORMAT};
-
-    asset.asset_ = LoadTextureFromImage(image);
-    if (not IsTextureValid(asset))
+    static auto asset = []
     {
-        throw std::runtime_error("Failed to load default texture");
-    }
+        TextureAsset texture;
+        texture.assetPath_ = interfaces::DefaultAssetName;
+
+        constexpr Image image{.data = asset::placeholders::DEFAULT_TEXTURE_DATA,
+                              .width = asset::placeholders::DEFAULT_TEXTURE_WIDTH,
+                              .height = asset::placeholders::DEFAULT_TEXTURE_HEIGHT,
+                              .mipmaps = 1,
+                              .format = asset::placeholders::DEFAULT_TEXTURE_FORMAT};
+
+        texture.asset_ = LoadTextureFromImage(image);
+        if (not IsTextureValid(texture))
+        {
+            throw std::runtime_error("Failed to load default texture");
+        }
+        return texture;
+    }();
 
     return asset;
 }
@@ -55,15 +59,19 @@ bool FontAsset::loadAsset(const std::filesystem::path& path)
     return asset_.texture.id != 0 and IsFontValid(asset_);
 }
 
-FontAsset FontAsset::LoadFallbackAsset()
+const FontAsset& FontAsset::LoadFallbackAsset()
 {
-    FontAsset asset;
-    asset.assetPath_ = interfaces::DefaultAssetName;
-    asset.asset_ = GetFontDefault();
-    if (not IsFontValid(asset))
+    static auto asset = []
     {
-        throw std::runtime_error("Failed to load default font");
-    }
+        FontAsset font;
+        font.assetPath_ = interfaces::DefaultAssetName;
+        font.asset_ = GetFontDefault();
+        if (not IsFontValid(font))
+        {
+            throw std::runtime_error("Failed to load default font");
+        }
+        return font;
+    }();
 
     return asset;
 }
@@ -95,18 +103,23 @@ void SoundAsset::freeAsset()
     }
 }
 
-SoundAsset SoundAsset::LoadFallbackAsset()
+const SoundAsset& SoundAsset::LoadFallbackAsset()
 {
-    SoundAsset asset;
-    asset.assetPath_ = interfaces::DefaultAssetName;
-    const auto wave = LoadWaveFromMemory(".wav", asset::placeholders::DEFAULT_SOUND,
-                                         sizeof(asset::placeholders::DEFAULT_SOUND));
-    asset.asset_ = LoadSoundFromWave(wave);
-    UnloadWave(wave);
-    if (not IsSoundValid(asset))
+    static auto asset = []
     {
-        throw std::runtime_error("Failed to load default sound");
-    }
+        SoundAsset sound;
+        sound.assetPath_ = interfaces::DefaultAssetName;
+        const auto wave = LoadWaveFromMemory(".wav", asset::placeholders::DEFAULT_SOUND,
+                                             sizeof(asset::placeholders::DEFAULT_SOUND));
+        sound.asset_ = LoadSoundFromWave(wave);
+        UnloadWave(wave);
+        if (not IsSoundValid(sound))
+        {
+            throw std::runtime_error("Failed to load default sound");
+        }
+
+        return sound;
+    }();
 
     return asset;
 }
@@ -121,9 +134,9 @@ bool MusicAsset::loadAsset(const std::filesystem::path& path)
     return IsMusicValid(asset_);
 }
 
-MusicAsset MusicAsset::LoadFallbackAsset()
+const MusicAsset& MusicAsset::LoadFallbackAsset()
 {
-    MusicAsset asset;
+    static MusicAsset asset;
     // asset.assetPath_ = interfaces::DefaultAssetName;
     // asset.asset_ = LoadMusicStreamFromMemory(".wav", asset::placeholders::DEFAULT_SOUND,
     // sizeof(asset::placeholders::DEFAULT_SOUND));

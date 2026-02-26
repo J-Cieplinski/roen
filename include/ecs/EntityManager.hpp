@@ -14,6 +14,8 @@ public:
     EntityManager();
     Entity createEntity();
     Entity getEntity(entt::entity entt);
+    void destroy(entt::entity entt);
+    void destroy(std::span<const entt::entity> entities);
 
     void clear();
 

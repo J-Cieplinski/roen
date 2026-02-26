@@ -14,7 +14,7 @@ namespace roen
 
 template <typename AssetType>
 concept DerivedFromIAsset = std::is_base_of_v<interfaces::IAsset, AssetType> and requires {
-    { AssetType::LoadFallbackAsset() } -> std::same_as<AssetType>;
+    { AssetType::LoadFallbackAsset() } -> std::same_as<const AssetType&>;
 };
 
 class IAssetManager
@@ -29,7 +29,6 @@ template <DerivedFromIAsset AssetType>
 class AssetManager : public IAssetManager
 {
 public:
-    AssetManager();
     ~AssetManager() override;
 
     void loadAsset(std::string_view id, const std::filesystem::path& path) override;
@@ -38,7 +37,7 @@ public:
     const AssetType& getAsset(std::uint64_t id) const;
 
 private:
-    std::unordered_map<std::uint64_t, AssetType> assets_;
+    std::unordered_map<std::uint64_t, AssetType> assets_{};
 };
 
 }  // namespace roen
@@ -51,15 +50,6 @@ private:
 
 namespace roen
 {
-
-template <DerivedFromIAsset AssetType>
-AssetManager<AssetType>::AssetManager()
-{
-    auto hashedString = hashString(interfaces::DefaultAssetName);
-    auto asset = AssetType::LoadFallbackAsset();
-
-    assets_[hashedString] = asset;
-}
 
 template <DerivedFromIAsset AssetType>
 AssetManager<AssetType>::~AssetManager()
@@ -111,7 +101,7 @@ const AssetType& AssetManager<AssetType>::getAsset(std::string_view id) const
     {
         SDK_WARN("{0} id: \"{1}\" does not exist",
                  getDemangledName(std::type_index(typeid(AssetType)).name()), id);
-        return assets_.at(interfaces::DefaultAssetID);
+        return AssetType::LoadFallbackAsset();
     }
 }
 
@@ -126,7 +116,7 @@ const AssetType& AssetManager<AssetType>::getAsset(std::uint64_t id) const
     {
         SDK_WARN("{0} id: \"{1}\" does not exist",
                  getDemangledName(std::type_index(typeid(AssetType)).name()), id);
-        return assets_.at(interfaces::DefaultAssetID);
+        return AssetType::LoadFallbackAsset();
     }
 }
 

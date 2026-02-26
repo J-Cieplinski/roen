@@ -1,7 +1,9 @@
-#include <../../include/lua/LuaApiBindings.hpp>
 #include <core/KeyCodes.hpp>
+#include <lua/LuaApiBindings.hpp>
 #include <lua/LuaScript.hpp>
 #include <lua/LuaWorker.hpp>
+
+#include <ecs/components/LifecycleComponent.hpp>
 
 namespace roen::lua
 {
@@ -41,7 +43,18 @@ std::vector<CommandBuffer> LuaWorker::executeBatch(
         }
 
         CommandBuffer cmds;
-        item.script->onUpdate(item.dt, input, query, &cmds, time, handle_map);
+
+        auto& lifecycle = item.script->getEntity().getComponent<ecs::LifecycleComponent>();
+        if (lifecycle.isAlive())
+        {
+            item.script->onUpdate(item.dt, input, query, &cmds, time, handle_map);
+        }
+        else if (lifecycle.isDying() and not lifecycle.triggered_on_death)
+        {
+            lifecycle.death_duration = item.script->onDeath(query, &cmds, time);
+            lifecycle.triggered_on_death = true;
+        }
+
         results.push_back(std::move(cmds));
     }
 

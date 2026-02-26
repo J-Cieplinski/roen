@@ -50,6 +50,7 @@ void LuaManager::onInit(interfaces::Scene* scene, int num_workers)
 
     // Create thread-safe query cache
     query_cache_ = std::make_unique<EntityQueryCache>(scene_);
+    lifecycle_system_ = std::make_unique<ecs::LifecycleSystem>(scene_);
 
     SDK_INFO("LuaManager initialized with {0} worker threads (libcoro)", num_workers);
 }
@@ -114,7 +115,6 @@ void LuaManager::initWorkers(int num_workers)
 {
     workers_.reserve(num_workers);
 
-    // Each worker gets its own Lua state (no shared state between workers)
     for (int i = 0; i < num_workers; i++)
     {
         auto worker = std::make_unique<LuaWorker>(i);
@@ -123,7 +123,6 @@ void LuaManager::initWorkers(int num_workers)
     }
 }
 
-// Coroutine that executes a batch of scripts on a specific worker
 coro::task<std::vector<CommandBuffer>> LuaManager::executeBatchAsync(
     int worker_idx, const std::vector<WorkItem>& batch, const InputSnapshot& input,
     double time) const
@@ -151,13 +150,6 @@ void LuaManager::update(float dt)
 
     for (auto [entity_handle, script] : scripts.each())
     {
-        if (auto entity = scene_->getEntityManager().getEntity(entity_handle);
-            entity.hasComponent<ecs::LifecycleComponent>())
-        {
-            auto& lifecycle = entity.getComponent<ecs::LifecycleComponent>();
-            if (!lifecycle.isAlive()) continue;
-        }
-
         std::size_t const script_hash = static_cast<std::size_t>(entity_handle);
         std::size_t const worker_id = script_hash % workers_.size();
 
@@ -189,6 +181,9 @@ void LuaManager::update(float dt)
     {
         applyCommands(cmd_buf.commands, scene_, handle_map_);
     }
+
+    auto dead_entities = lifecycle_system_->update(dt);
+    scene_->getEntityManager().destroy(dead_entities);
 }
 
 void LuaManager::onShutdown()

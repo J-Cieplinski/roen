@@ -11,6 +11,8 @@
 #include <coro/thread_pool.hpp>
 #include <sol2/sol.hpp>
 
+#include "ecs/systems/LifecycleSystem.hpp"
+
 namespace roen::interfaces
 {
 class Scene;
@@ -59,6 +61,7 @@ private:
     std::unordered_map<Handle, entt::entity> handle_map_;
 
     std::unique_ptr<EntityQueryCache> query_cache_;
+    std::unique_ptr<ecs::LifecycleSystem> lifecycle_system_;
 };
 
 }  // namespace roen::lua

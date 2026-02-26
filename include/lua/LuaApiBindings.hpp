@@ -117,7 +117,7 @@ inline void bindEcsApi(sol::state& lua)
         if (cmd_buf) cmd_buf->push(cmd);
     };
 
-    ecs.set_function("addGraphics", [&ecs_func](sol::object e_like, std::string tex,
+    ecs.set_function("setGraphics", [&ecs_func](sol::object e_like, std::string tex,
                                                 math::Rectangle rect, sol::this_environment te)
                      { ecs_func(te, AddGraphicsCmd{make_target(e_like), std::move(tex), rect}); });
 

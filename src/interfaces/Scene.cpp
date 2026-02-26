@@ -1,6 +1,6 @@
 #include <interfaces/Scene.hpp>
 
-#include <../../include/lua/LuaManager.hpp>
+#include <lua/LuaManager.hpp>
 
 namespace roen::interfaces
 {
@@ -37,7 +37,7 @@ void Scene::update()
 {
     auto events = queue_.getEvents();
     handler_.handleEvents(events);
-    lua::LuaManager::Instance().update(1);
+    lua::LuaManager::Instance().update(0.1f);
 }
 
 }  // namespace roen::interfaces

@@ -43,4 +43,9 @@ void AudioPlayer::Init(std::unique_ptr<interfaces::IAudioPlayer> impl)
     impl_ = std::move(impl);
 }
 
+void AudioPlayer::Shutdown()
+{
+    impl_.reset();
+}
+
 }  // namespace roen

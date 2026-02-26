@@ -103,11 +103,8 @@ inline void applyCommands(const std::vector<Command>& cmds, interfaces::Scene* s
                 {
                     auto ent = resolveTarget(c.entity, handle_map);
                     auto entity = scene->getEntityManager().getEntity(ent);
-                    if (entity and entity.template hasComponent<ecs::LifecycleComponent>())
-                    {
-                        auto& t = entity.template getComponent<ecs::LifecycleComponent>();
-                        t.state = ecs::EntityState::Dead;
-                    }
+                    auto& t = entity.template getComponent<ecs::LifecycleComponent>();
+                    t.state = ecs::EntityState::Dying;
                 }
                 else if constexpr (std::is_same_v<T, AddGraphicsCmd>)
                 {

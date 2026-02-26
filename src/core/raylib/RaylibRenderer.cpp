@@ -65,7 +65,7 @@ void RaylibRenderer::renderEntities(entt::registry& registry) const
 
         const auto& worldTransform = transform.worldTransform;
 
-        Rectangle dest{
+        const Rectangle dest{
             .x = worldTransform.getPosition().x,
             .y = worldTransform.getPosition().y,
             .width = graphics.srcRectangle.width * worldTransform.getScale().x,

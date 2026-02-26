@@ -15,9 +15,10 @@ enum class EntityState : std::uint8_t
 
 struct LifecycleComponent
 {
-    EntityState state = EntityState::Alive;
-    float death_timer = 0.0f;
-    float death_duration = 0.0f;
+    EntityState state{EntityState::Alive};
+    float death_timer{0.0f};
+    float death_duration{0.0f};
+    bool triggered_on_death{false};
 
     bool isAlive() const { return state == EntityState::Alive; }
     bool isDying() const { return state == EntityState::Dying; }

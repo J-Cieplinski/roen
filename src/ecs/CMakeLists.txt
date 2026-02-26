@@ -10,3 +10,5 @@ target_sources(${PROJECT_NAME}
     ${INCLUDE_DIR}/ecs/components/GraphicsComponent.hpp
     ${INCLUDE_DIR}/ecs/components/TransformComponent.hpp
 )
+
+add_subdirectory(systems)

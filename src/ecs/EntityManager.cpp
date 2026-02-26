@@ -7,6 +7,8 @@
 
 #include <log/Logger.hpp>
 
+#include "ecs/components/LifecycleComponent.hpp"
+
 namespace roen::ecs
 {
 
@@ -19,6 +21,8 @@ EntityManager::EntityManager()
 Entity EntityManager::createEntity()
 {
     Entity entity{registry_.create(), &registry_};
+    entity.addComponent<LifecycleComponent>();
+
     SDK_INFO("Created entity {}", entity);
 
     return entity;
@@ -27,6 +31,20 @@ Entity EntityManager::createEntity()
 Entity EntityManager::getEntity(entt::entity entt)
 {
     return {entt, &registry_};
+}
+
+void EntityManager::destroy(entt::entity entt)
+{
+    const Entity entity{entt, &registry_};
+    entity.destroy();
+}
+
+void EntityManager::destroy(std::span<const entt::entity> entities)
+{
+    for (const auto entity : entities)
+    {
+        destroy(entity);
+    }
 }
 
 void EntityManager::clear()

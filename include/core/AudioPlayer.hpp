@@ -12,6 +12,7 @@ class AudioPlayer
 {
 public:
     static void Init(std::unique_ptr<interfaces::IAudioPlayer> impl);
+    static void Shutdown();
 
     static void PlaySound(std::string_view asset);
     static void StopSound(std::string_view asset);

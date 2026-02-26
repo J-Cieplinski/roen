@@ -14,6 +14,8 @@ public:
     {
     }
 
+    virtual void update(float dt) = 0;
+
     virtual ~ISystem() = default;
 
 protected:
