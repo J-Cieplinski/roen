@@ -6,10 +6,10 @@
 #include <core/AudioPlayer.hpp>
 #include <interfaces/Scene.hpp>
 #include <log/Logger.hpp>
-#include <lua/experimental/CommandSystem.hpp>
-#include <lua/experimental/LuaScript.hpp>
+#include <lua/CommandSystem.hpp>
+#include <lua/LuaScript.hpp>
 
-namespace roen::lua::experimental
+namespace roen::lua
 {
 
 class LuaScript;
@@ -202,6 +202,6 @@ inline void applyCommands(const std::vector<Command>& cmds, interfaces::Scene* s
     }
 }
 
-}  // namespace roen::lua::experimental
+}  // namespace roen::lua
 
 #endif

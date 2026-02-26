@@ -10,7 +10,7 @@
 #include <variant>
 #include <vector>
 
-namespace roen::lua::experimental
+namespace roen::lua
 {
 
 using Handle = std::uint32_t;
@@ -170,6 +170,6 @@ struct InputSnapshot
     math::Vector2 mousePos() const { return mouse_pos; }
 };
 
-}  // namespace roen::lua::experimental
+}  // namespace roen::lua
 
 #endif

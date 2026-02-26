@@ -1,8 +1,14 @@
-#ifndef ROEN_LUA_LUA_MANAGER_HPP
-#define ROEN_LUA_LUA_MANAGER_HPP
+#ifndef ROEN_LUA_EXPERIMENTAL_LUA_MANAGER_HPP
+#define ROEN_LUA_EXPERIMENTAL_LUA_MANAGER_HPP
+
+#include <lua/CommandSystem.hpp>
+#include <lua/LuaWorker.hpp>
+#include <lua/ReadOnlyECS.hpp>
 
 #include <memory>
 
+#include <coro/task.hpp>
+#include <coro/thread_pool.hpp>
 #include <sol2/sol.hpp>
 
 namespace roen::interfaces
@@ -19,57 +25,42 @@ public:
     static LuaManager& Instance();
 
     LuaManager(LuaManager&) = delete;
-    LuaManager operator=(LuaManager&) = delete;
-    LuaManager operator=(LuaManager&&) = delete;
-    LuaManager(LuaManager&&) = delete;
-
+    LuaManager& operator=(const LuaManager&) = delete;
     ~LuaManager();
 
     sol::state_view getState() const;
 
-    void onInit(interfaces::Scene* scene);
+    // Initialize with worker count (uses libcoro thread pool)
+    void onInit(interfaces::Scene* scene, int num_workers = 4);
     void onShutdown();
-    void update();
-
-    template <typename... Args>
-    void callEventHandler(Args&&... args);
+    void update(float dt);
 
 private:
     LuaManager() = default;
 
-    static void InitLua();
-    static void InitLuaApplication();
-    static void InitLuaAssets();
-    static void InitLuaInput();
-    static void InitLuaLog();
-    static void InitEventTypes();
-    static void InitECS();
-    static void InitScene();
-    static void InitMathTypes();
-    static void InitLuaEventHandler();
-    static void InitUtils();
+    void initMainState();
+    void initWorkers(int num_workers);
+
+    coro::task<std::vector<CommandBuffer>> executeBatchAsync(int worker_idx,
+                                                             const std::vector<WorkItem>& batch,
+                                                             const InputSnapshot& input,
+                                                             double time) const;
 
     inline static std::unique_ptr<LuaManager> instance_;
+
     sol::state lua_;
-    sol::table luaEventManager_;
-    interfaces::Scene* scene_;
+
+    std::vector<std::unique_ptr<LuaWorker>> workers_;
+
+    std::unique_ptr<coro::thread_pool> thread_pool_;
+
+    interfaces::Scene* scene_ = nullptr;
+    double elapsed_time_ = 0;
+    std::unordered_map<Handle, entt::entity> handle_map_;
+
+    std::unique_ptr<EntityQueryCache> query_cache_;
 };
 
 }  // namespace roen::lua
 
-/*
- * Template implementation
- */
-
-namespace roen::lua
-{
-
-template <typename... Args>
-void LuaManager::callEventHandler(Args&&... args)
-{
-    luaEventManager_["handleEvents"](luaEventManager_, std::forward<Args>(args)...);
-}
-
-}  // namespace roen::lua
-
-#endif  // ROEN_LUA_LUA_MANAGER_HPP
+#endif

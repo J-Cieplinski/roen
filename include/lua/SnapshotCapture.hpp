@@ -2,9 +2,9 @@
 #define ROEN_LUA_SNAPSHOT_CAPTURE_HPP
 
 #include <core/Input.hpp>
-#include <lua/experimental/CommandSystem.hpp>
+#include <lua/CommandSystem.hpp>
 
-namespace roen::lua::experimental
+namespace roen::lua
 {
 
 inline InputSnapshot captureInput()
@@ -30,6 +30,6 @@ inline InputSnapshot captureInput()
     return snap;
 }
 
-}  // namespace roen::lua::experimental
+}  // namespace roen::lua
 
 #endif

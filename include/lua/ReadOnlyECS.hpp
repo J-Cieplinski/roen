@@ -7,14 +7,14 @@
 #include <ecs/components/GraphicsComponent.hpp>
 #include <ecs/components/TransformComponent.hpp>
 #include <interfaces/Scene.hpp>
-#include <lua/experimental/CommandSystem.hpp>
+#include <lua/CommandSystem.hpp>
 
 #include <optional>
 #include <shared_mutex>
 #include <sol2/sol.hpp>
 #include <unordered_map>
 
-namespace roen::lua::experimental
+namespace roen::lua
 {
 
 struct TransformSnapshot
@@ -219,6 +219,6 @@ private:
     EntityQueryCache* cache_;
 };
 
-}  // namespace roen::lua::experimental
+}  // namespace roen::lua
 
 #endif

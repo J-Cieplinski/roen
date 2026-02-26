@@ -1,9 +1,9 @@
+#include <../../include/lua/LuaApiBindings.hpp>
 #include <core/KeyCodes.hpp>
-#include <lua/experimental/LuaApiBindings.hpp>
-#include <lua/experimental/LuaScript.hpp>
-#include <lua/experimental/LuaWorker.hpp>
+#include <lua/LuaScript.hpp>
+#include <lua/LuaWorker.hpp>
 
-namespace roen::lua::experimental
+namespace roen::lua
 {
 
 LuaWorker::LuaWorker(int worker_id)
@@ -53,4 +53,4 @@ void LuaWorker::shutdown()
     running_ = false;
 }
 
-}  // namespace roen::lua::experimental
+}  // namespace roen::lua

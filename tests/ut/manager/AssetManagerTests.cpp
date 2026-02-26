@@ -61,7 +61,7 @@ private:
 class FloatStubAsset : public Asset<float>
 {
 public:
-    bool loadAsset(const std::filesystem::path& path) override
+    bool loadAsset(const std::filesystem::path&) override
     {
         return asset_;
     }

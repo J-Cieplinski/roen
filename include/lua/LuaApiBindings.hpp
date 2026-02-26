@@ -1,12 +1,12 @@
 #ifndef ROEN_LUA_API_BINDINGS_HPP
 #define ROEN_LUA_API_BINDINGS_HPP
 
-#include <lua/experimental/CommandSystem.hpp>
-#include <lua/experimental/ReadOnlyECS.hpp>
+#include <lua/CommandSystem.hpp>
+#include <lua/ReadOnlyECS.hpp>
 
 #include <sol2/sol.hpp>
 
-namespace roen::lua::experimental
+namespace roen::lua
 {
 
 inline Target make_target(sol::object const& obj)
@@ -348,6 +348,6 @@ inline void bindGlobalAPI(sol::state& lua)
                                  &SceneQuery::getEntity, "exists", &SceneQuery::exists);
 }
 
-}  // namespace roen::lua::experimental
+}  // namespace roen::lua
 
 #endif

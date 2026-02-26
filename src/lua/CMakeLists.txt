@@ -1,11 +1,16 @@
 target_sources(${PROJECT_NAME}
+    PUBLIC
+    ${INCLUDE_DIR}/lua/CommandApplicator.hpp
+    ${INCLUDE_DIR}/lua/CommandSystem.hpp
+    ${INCLUDE_DIR}/lua/LuaApiBindings.hpp
+    ${INCLUDE_DIR}/lua/LuaManager.hpp
+    ${INCLUDE_DIR}/lua/LuaScript.hpp
+    ${INCLUDE_DIR}/lua/LuaWorker.hpp
+    ${INCLUDE_DIR}/lua/ReadOnlyECS.hpp
+    ${INCLUDE_DIR}/lua/SnapshotCapture.hpp
+    ${INCLUDE_DIR}/lua/scripts/LuaEventHandler.hpp
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/LuaManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript.cpp
-    PUBLIC
-    ${INCLUDE_DIR}/lua/LuaManager.hpp
-    ${INCLUDE_DIR}/lua/LuaScript.hpp
-    ${INCLUDE_DIR}/lua/scripts/LuaEventHandler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaWorker.cpp
 )
-
-add_subdirectory(experimental)
