@@ -14,7 +14,11 @@ namespace interfaces
 class SystemMock final : public ISystem
 {
 public:
-    explicit SystemMock(entt::registry& entityManager) : ISystem(entityManager) {};
+    explicit SystemMock(entt::registry& entityManager)
+        : ISystem(entityManager)
+    {
+    }
+    MOCK_METHOD(void, update, (float), (override));
 };
 
 class SystemStub final : public ISystem
@@ -24,12 +28,13 @@ public:
         : ISystem(entityManager)
         , systemId(id)
     {
-    };
+    }
+    void update(float) override {};
 
     int systemId;
 };
 
-} // interfaces
+}  // namespace interfaces
 
 namespace data_structure
 {
@@ -42,13 +47,13 @@ protected:
 
 TEST_F(SystemsContainerTests, hasSystem_ShouldReturnFalseWhenSystemIsNotPresent)
 {
-    SystemsContainer sut {};
+    SystemsContainer sut{};
     EXPECT_FALSE(sut.hasSystem<interfaces::SystemStub>());
 }
 
 TEST_F(SystemsContainerTests, hasSystem_ShouldReturnTrueWhenSystemIsPresent)
 {
-    SystemsContainer sut {};
+    SystemsContainer sut{};
 
     sut.add<interfaces::SystemStub>(registry_);
     EXPECT_TRUE(sut.hasSystem<interfaces::SystemStub>());
@@ -56,7 +61,7 @@ TEST_F(SystemsContainerTests, hasSystem_ShouldReturnTrueWhenSystemIsPresent)
 
 TEST_F(SystemsContainerTests, add_ShouldAddSystem)
 {
-    SystemsContainer sut {};
+    SystemsContainer sut{};
 
     sut.add<interfaces::SystemStub>(registry_);
     EXPECT_TRUE(sut.hasSystem<interfaces::SystemStub>());
@@ -64,9 +69,9 @@ TEST_F(SystemsContainerTests, add_ShouldAddSystem)
 
 TEST_F(SystemsContainerTests, add_ShouldNotReplaceSystemIfTheSameTypeIsAlreadyPresent)
 {
-    SystemsContainer sut {};
-    constexpr int firstSystemId {1};
-    constexpr int secondSystemId {2};
+    SystemsContainer sut{};
+    constexpr int firstSystemId{1};
+    constexpr int secondSystemId{2};
 
     sut.add<interfaces::SystemStub>(registry_, firstSystemId);
     EXPECT_EQ(sut.get<interfaces::SystemStub>().systemId, firstSystemId);
@@ -77,7 +82,7 @@ TEST_F(SystemsContainerTests, add_ShouldNotReplaceSystemIfTheSameTypeIsAlreadyPr
 
 TEST_F(SystemsContainerTests, remove_ShouldRemoveSystem)
 {
-    SystemsContainer sut {};
+    SystemsContainer sut{};
 
     sut.add<interfaces::SystemStub>(registry_);
     EXPECT_TRUE(sut.hasSystem<interfaces::SystemStub>());
@@ -88,7 +93,7 @@ TEST_F(SystemsContainerTests, remove_ShouldRemoveSystem)
 
 TEST_F(SystemsContainerTests, remove_ShouldDoNothingIfSystemIsNotPresent)
 {
-    SystemsContainer sut {};
+    SystemsContainer sut{};
 
     sut.add<interfaces::SystemStub>(registry_);
     EXPECT_TRUE(sut.hasSystem<interfaces::SystemStub>());
@@ -99,27 +104,28 @@ TEST_F(SystemsContainerTests, remove_ShouldDoNothingIfSystemIsNotPresent)
 
 TEST_F(SystemsContainerTests, get_ShouldReturnSystem)
 {
-    SystemsContainer sut {};
+    SystemsContainer sut{};
 
     sut.add<interfaces::SystemStub>(registry_);
-    EXPECT_THAT(std::type_index(typeid(sut.get<interfaces::SystemStub>())), std::type_index(typeid(interfaces::SystemStub)));
+    EXPECT_THAT(std::type_index(typeid(sut.get<interfaces::SystemStub>())),
+                std::type_index(typeid(interfaces::SystemStub)));
 }
 
 TEST_F(SystemsContainerTests, get_ShouldThrowIfSystemNotPresent)
 {
-    SystemsContainer sut {};
+    SystemsContainer sut{};
     EXPECT_THROW(sut.get<interfaces::SystemStub>(), std::out_of_range);
 }
 
 TEST_F(SystemsContainerTests, ShouldBeAbleToIterateOverSystems)
 {
     constexpr int expectedNumOfLoops{2};
-    SystemsContainer sut {};
+    SystemsContainer sut{};
     sut.add<interfaces::SystemStub>(registry_);
     sut.add<interfaces::SystemMock>(registry_);
 
-    int numOfLoops {0};
-    for(const auto& system : sut)
+    int numOfLoops{0};
+    for ([[maybe_unused]] const auto& system : sut)
     {
         ++numOfLoops;
     }
@@ -127,6 +133,6 @@ TEST_F(SystemsContainerTests, ShouldBeAbleToIterateOverSystems)
     EXPECT_THAT(numOfLoops, expectedNumOfLoops);
 }
 
-} // data_structure
+}  // namespace data_structure
 
-} // roen
+}  // namespace roen

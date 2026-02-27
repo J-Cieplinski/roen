@@ -18,8 +18,8 @@ const std::string DUMMY_ID_2{"DUMMY_ID_2"};
 constexpr std::uint32_t VAL_FALSE{0};
 constexpr std::uint32_t VAL_1{1};
 constexpr std::uint32_t VAL_2{2};
-constexpr float DUMMY_FLOAT_VAL{123.123f};
-constexpr std::uint32_t DUMMY_INT_VAL{123};
+constexpr float DEFAULT_FLOAT_VAL{123.123f};
+constexpr std::uint32_t DEFAULT_INT_VAL{123};
 
 const std::map<std::string, int> pathToVal
     = {{FALSE_PATH, VAL_FALSE}, {DUMMY_PATH, VAL_1}, {DUMMY_PATH_2, VAL_2}};
@@ -39,17 +39,16 @@ public:
 
         return asset_;
     }
-    [[nodiscard]] int get() const override
+    [[nodiscard]] int get() const override { return asset_; }
+    void freeAsset() override {}
+    static const StubAsset& LoadFallbackAsset()
     {
-        return asset_;
-    }
-    void freeAsset() override
-    {
-    }
-    static StubAsset LoadFallbackAsset()
-    {
-        StubAsset asset;
-        asset.asset_ = DUMMY_INT_VAL;
+        static auto asset = []
+        {
+            StubAsset asset;
+            asset.asset_ = DEFAULT_INT_VAL;
+            return asset;
+        }();
 
         return asset;
     }
@@ -61,21 +60,17 @@ private:
 class FloatStubAsset : public Asset<float>
 {
 public:
-    bool loadAsset(const std::filesystem::path&) override
+    bool loadAsset(const std::filesystem::path&) override { return asset_; }
+    [[nodiscard]] float get() const override { return asset_; }
+    void freeAsset() override {}
+    static const FloatStubAsset& LoadFallbackAsset()
     {
-        return asset_;
-    }
-    [[nodiscard]] float get() const override
-    {
-        return asset_;
-    }
-    void freeAsset() override
-    {
-    }
-    static FloatStubAsset LoadFallbackAsset()
-    {
-        FloatStubAsset asset;
-        asset.asset_ = DUMMY_FLOAT_VAL;
+        static auto asset = []
+        {
+            FloatStubAsset asset;
+            asset.asset_ = DEFAULT_FLOAT_VAL;
+            return asset;
+        }();
 
         return asset;
     }
@@ -103,14 +98,16 @@ TEST_F(AssetManagerTests, loadAsset_ShouldLoadAsset)
 TEST_F(AssetManagerTests, free_ShouldUnloadAssets)
 {
     auto sut = AssetManager<interfaces::StubAsset<VAL_1>>();
+    EXPECT_NO_THROW(sut.loadAsset(DUMMY_ID, DUMMY_PATH));
+    EXPECT_EQ(sut.getAsset(DUMMY_ID), VAL_1);
     EXPECT_NO_THROW(sut.freeAssets());
-    EXPECT_THROW(sut.getAsset(DUMMY_ID), std::out_of_range);
+    EXPECT_EQ(sut.getAsset(DUMMY_ID), DEFAULT_INT_VAL);
 }
 
 TEST_F(AssetManagerTests, getAsset_ShouldReturnDefaultAssetOnAccessingNotPresentAsset)
 {
     auto sut = AssetManager<interfaces::StubAsset<VAL_1>>();
-    EXPECT_EQ(sut.getAsset(DUMMY_ID), DUMMY_INT_VAL);
+    EXPECT_EQ(sut.getAsset(DUMMY_ID), DEFAULT_INT_VAL);
 }
 
 TEST_F(AssetManagerTests, getAsset_ShouldReturnCorrectAsset)
@@ -130,7 +127,7 @@ TEST_F(AssetManagerTests, AssetContainerIsTheDifferentForDifferentTypesOfManager
     auto sutOne = AssetManager<interfaces::FloatStubAsset>();
 
     EXPECT_EQ(sut.getAsset(DUMMY_ID), VAL_1);
-    EXPECT_EQ(sutOne.getAsset(DUMMY_ID), DUMMY_FLOAT_VAL);
+    EXPECT_EQ(sutOne.getAsset(DUMMY_ID), DEFAULT_FLOAT_VAL);
 }
 
 }  // namespace manager
